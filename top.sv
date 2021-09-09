@@ -19,6 +19,9 @@ module top (
     /* LEDs */
     output logic [7:0] leds,
 
+    /* BUTTONS */
+    input [7:0] buttons,    
+
     /* UART */
     input uart_rx,
     output logic uart_tx
@@ -125,6 +128,9 @@ module top (
 
         /* LEDs */
         .leds(leds),
+
+	/* BUTTONs */
+	.buttons(buttons),
 
         /* UART */
         .uart_rx(uart_rx),

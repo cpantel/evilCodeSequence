@@ -38,6 +38,9 @@ module icicle (
     /* LEDs */
     output logic [7:0] leds,
 
+    /* BUTTONS */
+    input [7:0] buttons,
+
     /* UART */
     input uart_rx,
     output logic uart_tx
@@ -69,8 +72,8 @@ module icicle (
     logic mem_ready;
     logic mem_fault;
 
-    assign mem_read_value = ram_read_value | leds_read_value | uart_read_value | timer_read_value | flash_read_value;
-    assign mem_ready = ram_ready | leds_ready | uart_ready | timer_ready | flash_ready | mem_fault;
+    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | uart_read_value | timer_read_value | flash_read_value;
+    assign mem_ready = ram_ready | leds_ready | buttons_ready | uart_ready | timer_ready | flash_ready | mem_fault;
 
     bus_arbiter bus_arbiter (
         .clk(clk),
@@ -135,6 +138,7 @@ module icicle (
 
     logic ram_sel;
     logic leds_sel;
+    logic buttons_sel;
     logic uart_sel;
     logic timer_sel;
     logic flash_sel;
@@ -142,6 +146,7 @@ module icicle (
     always_comb begin
         ram_sel = 0;
         leds_sel = 0;
+	buttons_sel = 0;
         uart_sel = 0;
         timer_sel = 0;
         flash_sel = 0;
@@ -150,6 +155,7 @@ module icicle (
         casez (mem_address)
             32'b00000000_00000000_????????_????????: ram_sel = 1;
             32'b00000000_00000001_00000000_000000??: leds_sel = 1;
+            32'b00000000_00000001_00000000_000001??: buttons_sel = 1;
             32'b00000000_00000010_00000000_0000????: uart_sel = 1;
             32'b00000000_00000011_00000000_0000????: timer_sel = 1;
             32'b00000001_????????_????????_????????: flash_sel = 1;
@@ -186,6 +192,12 @@ module icicle (
             leds <= mem_write_value[7:0];
     end
 
+    logic [31:0] buttons_read_value;
+    logic buttons_ready;
+   
+    assign buttons_read_value = {24'b0, buttons_sel ? buttons : 8'b0}; 
+    assign buttons_ready = buttons_sel;
+   
     logic [31:0] uart_read_value;
     logic uart_ready;
 
