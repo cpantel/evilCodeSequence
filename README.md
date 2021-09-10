@@ -1,24 +1,27 @@
-# Icicle en EDU-FPGA
+# XXXX en icicle en EDU-FPGA
+
+
 
 Instrucciones específicas para [EDU-FPGA](http://www.proyecto-ciaa.com.ar/devwiki/doku.php?id=desarrollo%3Aedu-fpga):
 
 ## Instalación nativa de las herramientas
 
-Estos pasos fueron probados con `Linux Mint 20 Cinnamon` en un sistema de 64-bits `x86_64`.
+Estos pasos fueron probados con `Linux Mint 21 Mate` en un sistema de 64-bits `x86_64`.
 
 ### Prerrequisitos
 
 - Crear un directorio de trabajo y posicionarse en él.
 ```
-mkdir -p ~/edufpga-icicle/
-cd ~/edufpga-icicle/
+mkdir -p ~/workspace/
+cd ~/workspace/
 ```
 
-- Instalar dependencias disponibles en el repositorio (`make`, `vim`, entre otras necesarias para construir las herramientas).
+- Instalar dependencias disponibles en el repositorio.
 
 ```
 sudo apt update
-sudo apt install git make arachne-pnr fpga-icestorm vim autoconf automake autotools-dev curl python3 libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev gtkterm clang libreadline-dev tcl-dev libffi-dev graphviz xdot pkg-config libboost-system-dev libboost-python-dev libboost-filesystem-dev mercurial libftdi-dev qt5-default python3-dev libboost-all-dev cmake libeigen3-dev
+sudo apt install gperf build-essential cmake python3-dev texinfo vim libboost-all-dev tcl-dev libreadline-dev libffi-dev libeigen3-dev
+
 ```
 
 ### Toolchain RISC-V
@@ -28,11 +31,11 @@ Clonar y construir el toolchain para `RV32I`. La instalación necesita privilegi
 **NOTA**: Este repositorio es grande (~7GB). Clonarlo y luego construirlo lleva tiempo, ¡paciencia!
 
 ```
-cd ~/edufpga-icicle/
+cd ~/workspace/
 git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
 cd riscv-gnu-toolchain
 
-./configure --prefix=/opt/riscv
+./configure
 sudo make # compila e instala
 ```
 
@@ -41,7 +44,7 @@ sudo make # compila e instala
 La instalación necesita privilegios de root.
 
 ```
-cd ~/edufpga-icicle/
+cd ~/workspace/
 git clone git://github.com/steveicarus/iverilog.git
 cd iverilog
 sh autoconf.sh
@@ -55,7 +58,7 @@ sudo make install
 La instalación necesita privilegios de root.
 
 ```
-cd ~/edufpga-icicle/
+cd ~/workspace/
 git clone https://github.com/YosysHQ/icestorm.git icestorm
 cd icestorm
 make -j$(nproc)
@@ -67,7 +70,7 @@ sudo make install
 La instalación necesita privilegios de root.
 
 ```
-cd ~/edufpga-icicle/
+cd ~/workspace/
 git clone https://github.com/YosysHQ/nextpnr nextpnr --recursive
 cd nextpnr
 cmake -DARCH=ice40 -DCMAKE_INSTALL_PREFIX=/usr/local .
@@ -80,7 +83,7 @@ sudo make install
 La instalación necesita privilegios de root.
 
 ```
-cd ~/edufpga-icicle/
+cd ~/workspace/
 git clone https://github.com/YosysHQ/yosys.git yosys
 cd yosys
 make config-gcc
@@ -88,19 +91,29 @@ make -j$(nproc)
 sudo make install
 ```
 
+## Permisos
+
+Para que `iceprog` pueda acceder a la placa, puede hacer falta:
+ 
+```
+echo 'ACTION=="add", ATTR{idVendor}=="0403", ATTR{idProduct}=="6010", MODE:="666"' |\
+sudo tee -a /etc/udev/rules.d/70-lattice.rules 1>/dev/null
+sudo service udev restart
+```
+## Conexión en Virtual Box
+
+No te olvides de conectar a la virtual:
+
+Devices -> USB -> FTDI Dual RS232-HS[0700]
+
 ## Generación del bitstream
 
-- Asegurar que el compilador esté disponible en `PATH`:
-```
-export PATH=/opt/riscv/bin/:$PATH
-```
-Así el comando `riscv64-unknown-elf-gcc` debería ser accesible.
 
 - Clonar repositorio, construir y grabar memoria SPI de la EDU-FPGA:
 ```
-cd ~/edufpga-icicle/
-git clone https://github.com/ciaa/icicle.git
-cd icicle
+cd ~/workspace/
+git clone https://github.com/cpantel/XXX.git
+cd XXX
 make BOARD=edufpga
 # antes de ejecutar el siguiente comando, conectar la EDU-FPGA a la PC
 make BOARD=edufpga flash
@@ -146,3 +159,14 @@ Bye.
 ```
 
 ¡Listo! Deberías ver destellar los LEDs de la EDU-FPGA y por la UART (`/dev/ttyUSB1`) deberías observar el mensaje `Hello, world!`.
+
+```
+$ cat /dev/ttyUSB1
+Hello, world!
+
+Hello, world!
+
+Hello, world!
+```
+
+
