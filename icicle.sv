@@ -17,7 +17,7 @@
 `define RESET_VECTOR 32'h00000000
 `endif
 
-module icicle #( parameter LEDCOUNT, BUTTONCOUNT) (
+module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     input clk,
     input reset,
 
@@ -184,18 +184,18 @@ module icicle #( parameter LEDCOUNT, BUTTONCOUNT) (
     logic [31:0] leds_read_value;
     logic leds_ready;
 
-    assign leds_read_value = {32-LEDCOUNT'b0, leds_sel ? leds : LEDCOUNT'b0};
+    assign leds_read_value = {(32-LEDCOUNT)'b0, leds_sel ? leds : LEDCOUNT'b0};
     assign leds_ready = leds_sel;
 
     always_ff @(posedge clk) begin
         if (leds_sel && mem_write_mask[0])
-            leds <= mem_write_value[7:0];
+            leds <= mem_write_value[LEDCOUNT -1:0];
     end
 
     logic [31:0] buttons_read_value;
     logic buttons_ready;
    
-    assign buttons_read_value = {32-BUTTONCOUNT'b0, buttons_sel ? buttons : BUTTONCOUNT'b0}; 
+    assign buttons_read_value = {(32-BUTTONCOUNT)'b0, buttons_sel ? buttons : BUTTONCOUNT'b0}; 
     assign buttons_ready = buttons_sel;
    
     logic [31:0] uart_read_value;

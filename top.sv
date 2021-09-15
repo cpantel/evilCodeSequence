@@ -3,7 +3,11 @@
 `include "pll.sv"
 `include "sync.sv"
 
-module top (
+module top #(
+   parameter LEDCOUNT = 4,
+   parameter BUTTONCOUNT = 4
+)
+(
 `ifndef INTERNAL_OSC
     input clk,
 `endif
@@ -35,8 +39,7 @@ module top (
         .CLKHF(clk)
     );
 `endif
-   parameter LEDCOUNT = 8;
-   parameter BUTTONCOUNT = 8;
+
 
 
 `ifdef SPI_FLASH
