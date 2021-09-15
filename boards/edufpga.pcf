@@ -1,21 +1,87 @@
+# 
 set_io clk       94
+set_io uart_rx   55
+set_io uart_tx   56
+
+# real board leds
 set_io leds[0]   1
 set_io leds[1]   2
 set_io leds[2]   3
 set_io leds[3]   4
+
+# real board buttons
+set_io buttons[0] 31
+set_io buttons[1] 32
+set_io buttons[2] 33
+set_io buttons[3] 34
+
 set_io leds[4]   7
 set_io leds[5]   8
 set_io leds[6]   9
 set_io leds[7]   10
 
-set_io buttons[0] 31
-set_io buttons[1] 32
-set_io buttons[2] 33
-set_io buttons[3] 34
 set_io buttons[4] 11
 set_io buttons[5] 12
 set_io buttons[6] 15
 set_io buttons[7] 16
 
-set_io uart_rx   55
-set_io uart_tx   56
+# pmod0
+#set_io pmod0[0]  11
+#set_io pmod0[1]  12
+#set_io pmod0[2]  15
+#set_io pmod0[3]  16
+#set_io pmod0[4]   7
+#set_io pmod0[5]   8
+#set_io pmod0[6]   9
+#set_io pmod0[7]  10
+
+
+#pmod1
+set_io pmod1[0] 24
+set_io pmod1[1] 23
+set_io pmod1[2] 22
+set_io pmod1[3] 21
+set_io pmod1[4] 20
+set_io pmod1[5] 19
+set_io pmod1[6] 18
+set_io pmod1[7] 17
+
+
+
+# arduino connector
+set_io arduino1[0]  107
+set_io arduino1[1]  106
+set_io arduino1[2]  105
+set_io arduino1[3]  104
+set_io arduino1[4]   99
+set_io arduino1[5]   98
+set_io arduino1[6]   97
+set_io arduino1[7]   96
+set_io arduino1[8]   95
+set_io arduino1[9]   85
+set_io arduino1[10]  84
+set_io arduino1[11]  83
+set_io arduino1[12]  89
+set_io arduino1[13]  81
+set_io arduino1[14]  80
+set_io arduino1[15]  79
+
+
+set_io arduino0[0]  122
+set_io arduino0[1]  124
+set_io arduino0[2]  125
+set_io arduino0[3]  128
+set_io arduino0[4]  129
+set_io arduino0[5]  130
+set_io arduino0[6]  134
+set_io arduino0[7]  135
+set_io arduino0[8]  136
+set_io arduino0[9]  137
+set_io arduino0[10] 138
+set_io arduino0[11] 139
+set_io arduino0[12] 141
+set_io arduino0[13] 143
+set_io arduino0[14] 142
+set_io arduino0[15] 144
+
+

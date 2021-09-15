@@ -17,10 +17,10 @@ module top (
 `endif
 
     /* LEDs */
-    output logic [7:0] leds,
+    output logic [LEDCOUNT -1:0] leds,
 
     /* BUTTONS */
-    input [7:0] buttons,    
+    input [BUTTONCOUNT - 1:0] buttons,    
 
     /* UART */
     input uart_rx,
@@ -35,6 +35,9 @@ module top (
         .CLKHF(clk)
     );
 `endif
+   parameter LEDCOUNT = 8;
+   parameter BUTTONCOUNT = 8;
+
 
 `ifdef SPI_FLASH
     logic flash_io0_en;
@@ -108,7 +111,7 @@ module top (
         .out(pll_locked)
     );
 
-    icicle icicle (
+    icicle  #( .LEDCOUNT(LEDCOUNT), .BUTTONCOUNT(BUTTONCOUNT)) icicle (
         .clk(pll_clk),
         .reset(reset),
 
