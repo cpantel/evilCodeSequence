@@ -44,6 +44,9 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     /* PMOD0 */
     output logic [7:0] pmod0,
 
+    /* PMOD1 */
+    input [7:0] pmod1,
+
     /* ARDUINO */
     output logic [31:0] arduino,
 
@@ -78,8 +81,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic mem_ready;
     logic mem_fault;
 
-    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | arduino_read_value | uart_read_value | timer_read_value | flash_read_value;
-    assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | arduino_ready | uart_ready | timer_ready | flash_ready | mem_fault;
+    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | uart_read_value | timer_read_value | flash_read_value;
+    assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | uart_ready | timer_ready | flash_ready | mem_fault;
 
     bus_arbiter bus_arbiter (
         .clk(clk),
@@ -146,6 +149,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic leds_sel;
     logic buttons_sel;
     logic pmod0_sel;
+    logic pmod1_sel;
     logic arduino_sel;
     logic uart_sel;
     logic timer_sel;
@@ -156,6 +160,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         leds_sel = 0;
         buttons_sel = 0;
         pmod0_sel = 0;
+        pmod1_sel = 0;
         arduino_sel = 0;
         uart_sel = 0;
         timer_sel = 0;
@@ -167,7 +172,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
             32'b00000000_00000001_00000000_000000??: leds_sel    = 1; // 0x00010000
             32'b00000000_00000001_00000000_000001??: buttons_sel = 1; // 0x00010004
             32'b00000000_00000001_00000000_000010??: pmod0_sel   = 1; // 0x00010008
-            32'b00000000_00000001_00000000_000011??: arduino_sel = 1; // 0x0001000c
+            32'b00000000_00000001_00000000_000011??: pmod1_sel   = 1; // 0x0001000c
+            32'b00000000_00000001_00000000_000100??: arduino_sel = 1; // 0x00010010
             32'b00000000_00000010_00000000_0000????: uart_sel    = 1; // 0x00020000
             32'b00000000_00000011_00000000_0000????: timer_sel   = 1; // 0x00030000
             32'b00000001_????????_????????_????????: flash_sel   = 1;
@@ -218,7 +224,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic [31:0] pmod0_read_value;
     logic pmod0_ready;
 
-    assign pmod0_read_value = {24'b0, pmod0_sel ? leds : 8'b0};
+    assign pmod0_read_value = {24'b0, pmod0_sel ? pmod0 : 8'b0};
     assign pmod0_ready = pmod0_sel;
 
     always_ff @(posedge clk) begin
@@ -226,12 +232,20 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
             pmod0 <= mem_write_value[7:0];
     end
 
+    /* PMOD1 */
+
+    logic [31:0] pmod1_read_value;
+    logic pmod1_ready;
+
+    assign pmod1_read_value = {24'b0, pmod1_sel ? pmod1 : 8'b0};
+    assign pmod1_ready = pmod1_sel;
+
     /* ARDUINO */
 
     logic [31:0] arduino_read_value;
     logic arduino_ready;
 
-    assign arduino_read_value = {arduino_sel ? leds : 32'b0};
+    assign arduino_read_value = {arduino_sel ? arduino : 32'b0};
     assign arduino_ready = arduino_sel;
 
     always_ff @(posedge clk) begin
