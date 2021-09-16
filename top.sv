@@ -24,7 +24,10 @@ module top #(
     output logic [LEDCOUNT -1:0] leds,
 
     /* BUTTONS */
-    input [BUTTONCOUNT - 1:0] buttons,    
+    input [BUTTONCOUNT - 1:0] buttons,
+
+    /* PMOD0 */
+    output logic [7:0] pmod0,
 
     /* UART */
     input uart_rx,
@@ -135,8 +138,11 @@ module top #(
         /* LEDs */
         .leds(leds),
 
-	/* BUTTONs */
-	.buttons(buttons),
+        /* BUTTONs */
+        .buttons(buttons),
+
+        /* PMOD0 */
+        .pmod0(pmod0),
 
         /* UART */
         .uart_rx(uart_rx),
