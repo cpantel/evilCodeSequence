@@ -29,6 +29,9 @@ module top #(
     /* PMOD0 */
     output logic [7:0] pmod0,
 
+    /* ARDUINO */
+    output logic [31:0] arduino,
+
     /* UART */
     input uart_rx,
     output logic uart_tx
@@ -143,6 +146,10 @@ module top #(
 
         /* PMOD0 */
         .pmod0(pmod0),
+
+        /* ARDUINO */
+        .arduino(arduino),
+
 
         /* UART */
         .uart_rx(uart_rx),
