@@ -27,14 +27,19 @@ module top #(
     input [BUTTONCOUNT - 1:0] buttons,
 
     /* PMOD0 */
+`ifdef PMOD0
     output logic [7:0] pmod0,
+`endif
 
     /* PMOD1 */
+`ifdef PMOD1
     input [7:0] pmod1,
-
+`endif
 
     /* ARDUINO */
+`ifdef ARDUINO
     output logic [31:0] arduino,
+`endif
 
     /* UART */
     input uart_rx,
@@ -149,13 +154,19 @@ module top #(
         .buttons(buttons),
 
         /* PMOD0 */
+`ifdef PMOD0
         .pmod0(pmod0),
+`endif
 
         /* PMOD1 */
+`ifdef PMOD1
         .pmod1(pmod1),
+`endif
 
         /* ARDUINO */
+`ifdef ARDUINO
         .arduino(arduino),
+`endif
 
         /* UART */
         .uart_rx(uart_rx),

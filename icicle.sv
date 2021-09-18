@@ -224,6 +224,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic [31:0] pmod0_read_value;
     logic pmod0_ready;
 
+`ifdef PMOD0
     assign pmod0_read_value = {24'b0, pmod0_sel ? pmod0 : 8'b0};
     assign pmod0_ready = pmod0_sel;
 
@@ -231,20 +232,30 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         if (pmod0_sel && mem_write_mask[0])
             pmod0 <= mem_write_value[7:0];
     end
+`else
+    assign pmod0_read_value = 0;
+    assign pmod0_ready = pmod0_sel;
+`endif
 
     /* PMOD1 */
 
     logic [31:0] pmod1_read_value;
     logic pmod1_ready;
 
+`ifdef PMOD1
     assign pmod1_read_value = {24'b0, pmod1_sel ? pmod1 : 8'b0};
     assign pmod1_ready = pmod1_sel;
+`else
+    assign pmod1_read_value = 0;
+    assign pmod1_ready = pmod1_sel;
+`endif
 
     /* ARDUINO */
 
     logic [31:0] arduino_read_value;
     logic arduino_ready;
 
+`ifdef ARDUINO
     assign arduino_read_value = {arduino_sel ? arduino : 32'b0};
     assign arduino_ready = arduino_sel;
 
@@ -259,6 +270,12 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
             arduino[31:24] <= mem_write_value[31:24];
     end
 
+`else
+    assign arduino_read_value = 0;
+    assign arduino_ready = arduino_sel;
+`endif
+
+    /* UART */
 
     logic [31:0] uart_read_value;
     logic uart_ready;
@@ -281,6 +298,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         .ready_out(uart_ready)
     );
 
+    /* TIMER */
+
     logic [31:0] timer_read_value;
     logic timer_ready;
 
@@ -300,6 +319,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         .write_value_in(mem_write_value),
         .ready_out(timer_ready)
     );
+
+    /* FLASH */
 
     logic [31:0] flash_read_value;
     logic flash_ready;

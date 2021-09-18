@@ -36,7 +36,7 @@ static inline uint32_t rdcycle(void) {
 }
 
 int main() {
-    unsigned int shift = 1;
+    unsigned int shift = 0x01010101;
     UART_BAUD = FREQ / BAUD_RATE;
 
     for (;;) {
@@ -46,8 +46,8 @@ int main() {
 
         ARDUINO = shift;
         shift = shift << 1;
-        if (shift == 0) {
-          shift = 1;
+        if (shift == 0x01010100) {
+          shift |= 1;
         }
 
         uint32_t start = rdcycle();
