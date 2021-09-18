@@ -1,172 +1,174 @@
-# XXXX en icicle en EDU-FPGA
+# Icicle
 
+## Introduction
 
+Icicle is a 32-bit [RISC-V][riscv] system on chip for [iCE40 HX8K][ice40],
+[iCE40 UP5K][ice40-up5k] and [ECP5][ecp5] FPGAs. It can be built with the
+open-source [SymbiFlow][symbiflow] toolchain and currently targets several
+development boards.
 
-Instrucciones específicas para [EDU-FPGA](http://www.proyecto-ciaa.com.ar/devwiki/doku.php?id=desarrollo%3Aedu-fpga):
+## Current features
 
-## Instalación nativa de las herramientas
+* RV32I core with a [classic 5-stage RISC pipeline][classic-risc], static branch
+  prediction, bypassing and interlocking. It currently implements the entire
+  [user ISA][riscv-user] parts of the [privileged ISA][riscv-priv].
+* Shared instruction and data memory (8 KiB, implemented with FPGA block RAM).
+* Memory-mapped UART and LEDs.
+* Memory-mapped SPI flash.
 
-Estos pasos fueron probados con `Linux Mint 21 Mate` en un sistema de 64-bits `x86_64`.
+## Dependencies
 
-### Prerrequisitos
+* [GNU Make][make]
+* [GNU RISC-V toolchain][riscv-gnu]
+* [Icarus Verilog][iverilog] (`master` branch)
+* [nextpnr][nextpnr] or [arachne-pnr][arachne-pnr]
+* [Project IceStorm][icestorm] or [Project Trellis][trellis]
+* [vim][vim] (for `xxd`)
+* [Yosys][yosys] (`master` branch)
 
-- Crear un directorio de trabajo y posicionarse en él.
-```
-mkdir -p ~/workspace/
-cd ~/workspace/
-```
+## Building and testing
 
-- Instalar dependencias disponibles en el repositorio.
+### Supported boards
 
-```
-sudo apt update
-sudo apt install gperf build-essential cmake python3-dev texinfo vim libboost-all-dev tcl-dev libreadline-dev libffi-dev libeigen3-dev
+Icicle supports several development boards:
 
-```
+* `blackice-ii`: [BlackIce II][blackice-ii-board]
+* `ecp5-evn`: [ECP5 evaluation board][ecp5-evn]
+* `edufpga`: [EDU-CIAA-FPGA iCE40-HX4k board](./EDU-FPGA.md)
+* `ice40hx8k-b-evn`: [iCE40-HX8K breakout board][ice40-hx8k-breakout]
+* `icebreaker`: [iCEBreaker][icebreaker]
+* `upduino`: [UPduino][upduino]
 
-### Toolchain RISC-V
+`<board>` should be replaced with the internal name of your development board in
+the rest of the instructions (e.g. `ice40hx8k-b-evn` for the iCE40-HX8K breakout
+board).
 
-Clonar y construir el toolchain para `RV32I`. La instalación necesita privilegios de root.
+### Building
 
-**NOTA**: Este repositorio es grande (~7GB). Clonarlo y luego construirlo lleva tiempo, ¡paciencia!
+* Run `make BOARD=<board> syntax` to check the syntax with [Icarus][iverilog],
+  which has a stricter parser than [Yosys][yosys]. At the time of writing the
+  `master` branch of Icarus is required as there isn't a stable release with
+  `always_comb`/`always_ff` support yet.
+* Run `make BOARD=<board>` to synthesize the design, place and route, compile
+  the demo program in `progmem.c` and create the bitstream.
 
-```
-cd ~/workspace/
-git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
-cd riscv-gnu-toolchain
+### Programming
 
-./configure
-sudo make # compila e instala
-```
+#### BlackIce II
 
-### Icarus Verilog
+* Configure jumper on board for [DFU Mode][dfu-mode] and connect both USB1 and
+  USB2 on the board to host USB ports.
+* Run `make BOARD=blackice-ii dfu-flash` to flash the bitstream.
 
-La instalación necesita privilegios de root.
+#### ECP5 evaluation board
 
-```
-cd ~/workspace/
-git clone git://github.com/steveicarus/iverilog.git
-cd iverilog
-sh autoconf.sh
-./configure
-make
-sudo make install
-```
+* Remove R22, R23 and R24 to disconnect the channel B of the FTDI chip from the
+  I2C bus.
+* Populate R34 and R35 with zero-ohm resistors to connect channel B of the FTDI
+  chip to the UART RX and TX pins.
+* Optionally populate R21 with a zero-ohm resistor to enable the UART TX
+  indicator LED.
 
-### IceStorm
+#### EDU-FPGA
 
-La instalación necesita privilegios de root.
+* Run `make BOARD=edufpga flash` to flash the bitstream.
 
-```
-cd ~/workspace/
-git clone https://github.com/YosysHQ/icestorm.git icestorm
-cd icestorm
-make -j$(nproc)
-sudo make install
-```
+#### iCE40-HX8K breakout board
 
-### NextPNR
+* Configure the jumpers for flash programming.
+* Run `make BOARD=ice40hx8k-b-evn flash` to flash the bitstream.
 
-La instalación necesita privilegios de root.
+### Testing
 
-```
-cd ~/workspace/
-git clone https://github.com/YosysHQ/nextpnr nextpnr --recursive
-cd nextpnr
-cmake -DARCH=ice40 -DCMAKE_INSTALL_PREFIX=/usr/local .
-make -j$(nproc)
-sudo make install
-```
+* If your chosen board has built-in LEDs, some of the LEDs should turn on and blink.
+* Run `picocom -b 9600 /dev/ttyUSBn` (replacing `ttyUSBn` with the name of the
+  serial port) to connect to the serial port. `Hello, world!` should be printed
+  once per second.
 
-### Yosys
+### Other targets
 
-La instalación necesita privilegios de root.
+The `make BOARD=<board> stat` target runs `icebox_stat` and the
+`make BOARD=<board> time` target prints the `icetime` report.
 
-```
-cd ~/workspace/
-git clone https://github.com/YosysHQ/yosys.git yosys
-cd yosys
-make config-gcc
-make -j$(nproc)
-sudo make install
-```
+The `Makefile` runs the [IceStorm][icestorm] toolchain in quiet mode. Unset the
+`QUIET` variable to run the toolchain in verbose mode - e.g.
+`make BOARD=<board> QUIET= ...`.
 
-## Permisos
+Set the `PNR` variable to `arachne-pnr` to use [arachne-pnr][arachne-pnr]
+instead of [nextpnr][nextpnr] (the default) - e.g. `make PNR=arachne-pnr`.
 
-Para que `iceprog` pueda acceder a la placa, puede hacer falta:
- 
-```
-echo 'ACTION=="add", ATTR{idVendor}=="0403", ATTR{idProduct}=="6010", MODE:="666"' |\
-sudo tee -a /etc/udev/rules.d/70-lattice.rules 1>/dev/null
-sudo service udev restart
-```
-## Conexión en Virtual Box
+## Formal verification
 
-No te olvides de conectar a la virtual:
+Icicle supports the RISC-V Formal Interface (RVFI), allowing it to be formally
+verified with [SymbiYosys][symbiyosys] and [riscv-formal][riscv-formal]:
 
-Devices -> USB -> FTDI Dual RS232-HS[0700]
+* Run `git clone https://github.com/SymbioticEDA/riscv-formal` to clone
+  riscv-formal.
+* Run `cd riscv-formal/cores && git clone https://github.com/grahamedgecombe/icicle`
+  to clone Icicle in the `cores` subdirectory.
+* Run ``cd icicle && python ../../checks/genchecks.py && make -C checks -j `nproc```
+  to verify the core.
 
-## Generación del bitstream
+## Planned features
 
+* Use remaining block RAM tiles to eke out as much memory as possible.
+* Use the SPRAM tiles on UP5K devices.
+* Implement remaining bits of the user ISA.
+* Implement machine mode from the privileged ISA.
+* Interrupts/exceptions.
+* Unaligned memory access support.
+* Memory-mapped GPIOs.
+* Add XIP, DDR, DSPI and QSPI support to the SPI flash controller.
+* Improved reset support (a reset signal + boot ROM to zero all the registers).
+* Automated tests.
+* Multiply/divide support.
+* Compressed instruction support.
+* Add flags to disable certain features (e.g. privileged mode) to save LUTs on
+  smaller devices (e.g. the UP5K).
+* Investigate using DSP tiles on the UP5K.
 
-- Clonar repositorio, construir y grabar memoria SPI de la EDU-FPGA:
-```
-cd ~/workspace/
-git clone https://github.com/cpantel/XXX.git
-cd XXX
-make BOARD=edufpga
-# antes de ejecutar el siguiente comando, conectar la EDU-FPGA a la PC
-make BOARD=edufpga flash
-```
+## Size and performance
 
-Así se ve la salida típica de estos comandos:
+The entire system on chip currently occupies around 3,000 LUTs on an iCE40 when
+synthesized with [Yosys][yosys].
 
-```
-$ make BOARD=edufpga
-riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=36000000 -Os -ffreestanding -nostartfiles -g -Iprograms/hello   -c -o programs/hello/main.o programs/hello/main.c
-riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=36000000 -Os -ffreestanding -nostartfiles -g -Iprograms/hello -Wl,-Tprogmem.lds -o progmem programs/hello/main.o start.o
-riscv64-unknown-elf-objcopy -O binary progmem progmem.bin
-xxd -p -c 4 < progmem.bin > progmem.hex
-yosys -q ice40.ys
-arachne-pnr -q -d 8k -P tq144:4k -o top_syn.asc -p boards/edufpga.pcf top.blif
-icebram progmem_syn.hex progmem.hex < top_syn.asc > top.asc
-icepack top.asc top.bin
-```
-```
-$ make BOARD=edufpga flash
-icetime -t -m -d hx8k -P tq144:4k -p boards/edufpga.pcf -c 36 -r top.rpt top_syn.asc
-// Reading input .pcf file..
-// Reading input .asc file..
-// Reading 8k chipdb file..
-// Creating timing netlist..
-// Timing estimate: 27.43 ns (36.45 MHz)
-// Checking 27.78 ns (36.00 MHz) clock constraint: PASSED.
-iceprog top.bin
-init..
-cdone: high
-reset..
-cdone: low
-flash ID: 0xEF 0x30 0x13 0x00
-file size: 135100
-erase 64kB sector at 0x000000..
-erase 64kB sector at 0x010000..
-erase 64kB sector at 0x020000..
-programming..
-reading..
-VERIFY OK
-cdone: high
-Bye.
-```
+If bypassing and branch prediction are disabled [nextpnr][nextpnr] estimates it
+can be clocked at around 50 MHz on a HX series device and 20 MHz on a UP series
+device.
 
-¡Listo! Deberías ver destellar los LEDs de la EDU-FPGA y por la UART (`/dev/ttyUSB1`) deberías observar el mensaje `Hello, world!`.
+The core is capable of issuing and retiring one instruction per clock cycle,
+although the actual number of instructions per cycle will be slightly less than
+this in practice due to interlocking, branch mispredictions and the shared
+memory bus.
 
-```
-$ cat /dev/ttyUSB1
-Hello, world!
+## License
 
-Hello, world!
+This project is available under the terms of the ISC license, which is similar
+to the 2-clause BSD license. See the `LICENSE` file for the copyright
+information and licensing terms.
 
-Hello, world!
-```
-
-
+[arachne-pnr]: https://github.com/cseed/arachne-pnr#readme
+[blackice-ii-board]: https://github.com/mystorm-org/BlackIce-II#readme
+[classic-risc]: https://en.wikipedia.org/wiki/Classic_RISC_pipeline
+[dfu-mode]: https://github.com/mystorm-org/BlackIce-II/wiki/DFU-operations-on-the-BlackIce-II
+[ecp5-evn]: https://www.latticesemi.com/en/Products/DevelopmentBoardsAndKits/ECP5EvaluationBoard.aspx
+[ecp5]: https://www.latticesemi.com/Products/FPGAandCPLD/ECP5.aspx
+[ice40-hx8k-breakout]: https://www.latticesemi.com/Products/DevelopmentBoardsAndKits/iCE40HX8KBreakoutBoard.aspx
+[ice40-up5k]: https://www.latticesemi.com/Products/FPGAandCPLD/iCE40Ultra.aspx
+[ice40]: https://www.latticesemi.com/Products/FPGAandCPLD/iCE40.aspx
+[icebreaker]: https://github.com/icebreaker-fpga/
+[icestorm]: http://www.clifford.at/icestorm/
+[iverilog]: http://iverilog.icarus.com/
+[make]: https://www.gnu.org/software/make/
+[nextpnr]: https://github.com/YosysHQ/nextpnr#readme
+[riscv-formal]: https://github.com/SymbioticEDA/riscv-formal
+[riscv-gnu]: https://github.com/riscv/riscv-gnu-toolchain#readme
+[riscv-priv]: https://riscv.org/specifications/privileged-isa/
+[riscv-user]: https://riscv.org/specifications/
+[riscv]: https://riscv.org/risc-v-isa/
+[symbiflow]: https://symbiflow.github.io/
+[symbiyosys]: https://symbiyosys.readthedocs.io/
+[trellis]: https://github.com/SymbiFlow/prjtrellis#readme
+[upduino]: http://gnarlygrey.atspace.cc/development-platform.html#upduino
+[vim]: https://www.vim.org/
+[yosys]: http://www.clifford.at/yosys/
