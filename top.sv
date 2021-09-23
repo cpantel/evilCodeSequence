@@ -2,7 +2,7 @@
 `include "icicle.sv"
 `include "pll.sv"
 `include "sync.sv"
-`include "rtc.sv"
+
 
 module top #(
    parameter LEDCOUNT = 4,
@@ -29,8 +29,6 @@ module top #(
 
     /* PMOD0 */
 `ifdef PMOD0
-    output logic [7:0] pmod0,
-`else
     output logic [7:0] pmod0,
 `endif
 
@@ -175,26 +173,5 @@ module top #(
         .uart_rx(uart_rx),
         .uart_tx(uart_tx)
     );
-
-
-    assign pmod0[3:0] = secondsLo[0:3];
-    assign pmod0[7:4] = secondsHi[0:3];
-    logic [3:0] secondsLo;
-    logic [3:0] secondsHi;
-
-    rtc #(.COUNT(36000000)) rtc (
-        .clk_in(pll_clk),
-        .reset(reset),
-        .secondsLo(secondsLo),
-        .secondsHi(secondsHi)
-    );
-
-    /* ATTACK */
-    // USE pmod0 AS OUTPUT
-
-    
-
-
-
 
 endmodule
