@@ -42,6 +42,8 @@ module top #(
     output logic [31:0] arduino,
 `endif
 
+    output logic [31:0] arduino,
+
     /* UART */
     input uart_rx,
     output logic uart_tx
@@ -169,9 +171,26 @@ module top #(
         .arduino(arduino),
 `endif
 
+
         /* UART */
         .uart_rx(uart_rx),
         .uart_tx(uart_tx)
     );
-
+    logic [20:0]q;
+    initial q = 0;
+    always_ff @(posedge pll_clk) begin
+      if ( q < 36000 ) begin
+         arduino[0] <= 1;
+         q <= q + 1; 
+      end else if ( q < 36000 * 2 && ! buttons[0] ) begin
+         arduino[0] <= 1;
+         q <= q + 1; 
+      end else if (q < 36000 * 20 ) begin
+         arduino[0] <= 0;
+         q <= q + 1; 
+      end else begin
+         arduino[0] <= 0;
+         q <= 0;
+      end
+    end
 endmodule
