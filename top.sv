@@ -28,17 +28,17 @@ module top #(
     input [BUTTONCOUNT - 1:0] buttons,
 
     /* PMOD0 */
-`ifdef PMOD0
+`ifdef PMOD0_CONN
     output logic [7:0] pmod0,
 `endif
 
     /* PMOD1 */
-`ifdef PMOD1
+`ifdef PMOD1_CONN
     input [7:0] pmod1,
 `endif
 
     /* ARDUINO */
-`ifdef ARDUINO
+`ifdef ARDUINO_CONN
     output logic [31:0] arduino,
 `endif
 
@@ -157,40 +157,23 @@ module top #(
         .buttons(buttons),
 
         /* PMOD0 */
-`ifdef PMOD0
+`ifdef PMOD0_CONN
         .pmod0(pmod0),
 `endif
 
         /* PMOD1 */
-`ifdef PMOD1
+`ifdef PMOD1_CONN
         .pmod1(pmod1),
 `endif
 
         /* ARDUINO */
-`ifdef ARDUINO
+`ifdef ARDUINO_CONN
         .arduino(arduino),
 `endif
-
 
         /* UART */
         .uart_rx(uart_rx),
         .uart_tx(uart_tx)
     );
-    logic [20:0]q;
-    initial q = 0;
-    always_ff @(posedge pll_clk) begin
-      if ( q < 36000 ) begin
-         arduino[0] <= 1;
-         q <= q + 1; 
-      end else if ( q < 36000 * 2 && ! buttons[0] ) begin
-         arduino[0] <= 1;
-         q <= q + 1; 
-      end else if (q < 36000 * 20 ) begin
-         arduino[0] <= 0;
-         q <= q + 1; 
-      end else begin
-         arduino[0] <= 0;
-         q <= 0;
-      end
-    end
+
 endmodule

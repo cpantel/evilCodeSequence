@@ -5,6 +5,7 @@
 `include "timer.sv"
 `include "uart.sv"
 `include "rtc.sv"
+`include "servo.sv"
 
 `ifdef ECP5
 `define RAM_SIZE 8192
@@ -228,7 +229,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic [31:0] pmod0_read_value;
     logic pmod0_ready;
 
-`ifdef PMOD0
+`ifdef PMOD0_DEV
     assign pmod0_read_value = {24'b0, pmod0_sel ? pmod0 : 8'b0};
     assign pmod0_ready = pmod0_sel;
 
@@ -246,7 +247,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic [31:0] pmod1_read_value;
     logic pmod1_ready;
 
-`ifdef PMOD1
+`ifdef PMOD1_DEV
     assign pmod1_read_value = {24'b0, pmod1_sel ? pmod1 : 8'b0};
     assign pmod1_ready = pmod1_sel;
 `else
@@ -259,7 +260,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic [31:0] arduino_read_value;
     logic arduino_ready;
 
-`ifdef ARDUINO
+`ifdef ARDUINO_DEV
     assign arduino_read_value = {arduino_sel ? arduino : 32'b0};
     assign arduino_ready = arduino_sel;
 
@@ -297,6 +298,14 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         .ready_out(rtc_ready)
     );
 
+    /* SERVO */
+
+    servo #(.BASETIME(36000)) servo (
+        .clk(clk),
+        .reset(reset),
+        .hiLo(buttons[0]),
+        .pwm(arduino[0])
+    );
 
     /* UART */
 
