@@ -83,8 +83,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic mem_ready;
     logic mem_fault;
 
-    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | uart_read_value | timer_read_value | flash_read_value;
-    assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | uart_ready | timer_ready | flash_ready | mem_fault;
+    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | servo_read_value | uart_read_value | timer_read_value | flash_read_value;
+    assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | servo_ready | uart_ready | timer_ready | flash_ready | mem_fault;
 
     bus_arbiter bus_arbiter (
         .clk(clk),
@@ -154,6 +154,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic pmod1_sel;
     logic arduino_sel;
     logic rtc_sel;
+    logic servo_sel;
     logic uart_sel;
     logic timer_sel;
     logic flash_sel;
@@ -166,6 +167,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         pmod1_sel = 0;
         arduino_sel = 0;
         rtc_sel = 0;
+        servo_sel = 0;
         uart_sel = 0;
         timer_sel = 0;
         flash_sel = 0;
@@ -179,6 +181,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
             32'b00000000_00000001_00000000_000011??: pmod1_sel   = 1; // 0x0001000c
             32'b00000000_00000001_00000000_000100??: arduino_sel = 1; // 0x00010010
             32'b00000000_00000001_00000000_000101??: rtc_sel     = 1; // 0x00010014
+            32'b00000000_00000001_00000000_000110??: servo_sel   = 1; // 0x00010018
             32'b00000000_00000010_00000000_0000????: uart_sel    = 1; // 0x00020000
             32'b00000000_00000011_00000000_0000????: timer_sel   = 1; // 0x00030000
             32'b00000001_????????_????????_????????: flash_sel   = 1;
@@ -300,11 +303,22 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
 
     /* SERVO */
 
+    logic [31:0] servo_read_value;
+    logic servo_ready;
+
     servo #(.BASETIME(36000)) servo (
         .clk(clk),
         .reset(reset),
-        .hiLo(buttons[0]),
-        .pwm(arduino[0])
+        .pwm(arduino[0]),
+        .monitor(arduino[23:16]),
+        /* memory bus */
+        .address_in(mem_address),
+        .sel_in(servo_sel),
+        .read_in(mem_read),
+        .read_value_out(servo_read_value),
+        .write_mask_in(mem_write_mask),
+        .write_value_in(mem_write_value),
+        .ready_out(servo_ready)
     );
 
     /* UART */
