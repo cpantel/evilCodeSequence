@@ -54,7 +54,7 @@ syntax: $(SRC) progmem_syn.hex defines.sv
 	iverilog -D$(shell echo $(ARCH) | tr 'a-z' 'A-Z') -Wall -t null -g2012 $(YS_ICE40) $(SV)
 
 defines.sv: boards/$(BOARD)-defines.sv
-	cp boards/$(BOARD)-defines.sv defines.sv
+	cp boards/$(BOARD)-defines.sv defines.sv ; cat programs/$(PROGRAM)/$(BOARD)-defines.sv >> defines.sv
 
 start.s: start-$(PROGMEM).s
 	cp $< $@
