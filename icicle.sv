@@ -19,6 +19,9 @@
 `define RESET_VECTOR 32'h00000000
 `endif
 
+
+`define FREQ 36000000
+
 module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     input clk,
     input reset,
@@ -291,7 +294,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic [31:0] rtc_read_value;
     logic rtc_ready;
 `ifdef RTC_DEV
-    rtc #(.COUNT(36000000)) rtc (
+    rtc #(.COUNT(`FREQ)) rtc (
         .clk_in(clk),
         .reset(reset),
         /* memory bus */
@@ -313,10 +316,10 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
 //    logic [31:0] servo_read_value;
     logic servo_ready;
 `ifdef SERVO_DEV
-    servo #(.BASETIME(36000)) servo (
+    servo #(.BASETIME(`FREQ)) servo (
         .clk(clk),
         .reset(reset),
-        .pwm(arduino[1]),
+        .pwm(arduino[0]),
         .monitor(arduino[23:16]),
         /* memory bus */
         .address_in(mem_address),
