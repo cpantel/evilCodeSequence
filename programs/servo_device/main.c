@@ -42,7 +42,7 @@ int main() {
     LEDS = 0xAA;
 
     for (;;) {
-        for (uint32_t i = 0; i<=10; ++i) {
+        for (char i = 0; i<=10; ++i) {
   //         uart_puts("Servo under control\r\n");
            SERVO = i;
            LEDS = ~LEDS;

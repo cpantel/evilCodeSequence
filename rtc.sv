@@ -9,7 +9,7 @@ module rtc #(
     /* memory bus */
     input [31:0] address_in,
     input sel_in,
-    input read_in,
+//    input read_in,
     output logic [31:0] read_value_out,
     input [3:0] write_mask_in,
     input [31:0] write_value_in,

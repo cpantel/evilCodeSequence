@@ -83,7 +83,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic mem_ready;
     logic mem_fault;
 
-    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | servo_read_value | uart_read_value | timer_read_value | flash_read_value;
+    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | /*servo_read_value | */ uart_read_value | timer_read_value | flash_read_value;
     assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | servo_ready | uart_ready | timer_ready | flash_ready | mem_fault;
 
     bus_arbiter bus_arbiter (
@@ -189,6 +189,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         endcase
     end
 
+    /* RAM */
+
     logic [31:0] ram_read_value;
     logic ram_ready;
 
@@ -208,6 +210,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     );
 
     /* LEDs */
+
     logic [31:0] leds_read_value;
     logic leds_ready;
 
@@ -287,45 +290,53 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
 
     logic [31:0] rtc_read_value;
     logic rtc_ready;
-
+`ifdef RTC_DEV
     rtc #(.COUNT(36000000)) rtc (
         .clk_in(clk),
         .reset(reset),
         /* memory bus */
         .address_in(mem_address),
         .sel_in(rtc_sel),
-        .read_in(mem_read),
+//        .read_in(mem_read),
         .read_value_out(rtc_read_value),
         .write_mask_in(mem_write_mask),
         .write_value_in(mem_write_value),
         .ready_out(rtc_ready)
     );
+`else
+    assign rtc_read_value = 0;
+    assign rtc_ready = rtc_sel;
+`endif
 
     /* SERVO */
 
-    logic [31:0] servo_read_value;
+//    logic [31:0] servo_read_value;
     logic servo_ready;
-
+`ifdef SERVO_DEV
     servo #(.BASETIME(36000)) servo (
         .clk(clk),
         .reset(reset),
-        .pwm(arduino[0]),
+        .pwm(arduino[1]),
         .monitor(arduino[23:16]),
         /* memory bus */
         .address_in(mem_address),
         .sel_in(servo_sel),
-        .read_in(mem_read),
-        .read_value_out(servo_read_value),
+        //.read_in(mem_read),
+       // .read_value_out(servo_read_value),
         .write_mask_in(mem_write_mask),
         .write_value_in(mem_write_value),
         .ready_out(servo_ready)
     );
+`else
+//    assign servo_read_value = 0;
+    assign servo_ready = rtc_sel;
+`endif
 
     /* UART */
 
     logic [31:0] uart_read_value;
     logic uart_ready;
-
+`ifdef UART_DEV
     uart uart (
         .clk(clk),
         .reset(reset),
@@ -343,6 +354,10 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         .write_value_in(mem_write_value),
         .ready_out(uart_ready)
     );
+`else
+    assign uart_read_value = 0;
+    assign uart_ready = rtc_sel;
+`endif
 
     /* TIMER */
 
