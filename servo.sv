@@ -39,7 +39,7 @@ module servo #( parameter BASETIME) (
     always_ff @(posedge clk) begin
         if (reset)
             q <= 0;
-        else if ( q > BASETIME * 20 )
+        else if ( q > ( BASETIME / 1000 * 20 ) )
             q <= 0;
         else 
             q <= q + 1;
@@ -49,9 +49,9 @@ module servo #( parameter BASETIME) (
         if (reset) begin
             pulse <= 0;
         end else begin
-            if ( q > BASETIME * 20 ) begin
+            if ( q > ( BASETIME / 1000 * 20 ) )begin
                 pulse <= 0;
-            end else if ( q > BASETIME * 2) begin
+            end else if ( q > ( BASETIME / 1000 * 2) ) begin
                 pulse <= 0;
             end else begin
                 pulse <= ( selector == 8'h0 && q < ( BASETIME / 10000 * 10 )  ) ||

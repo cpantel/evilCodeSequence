@@ -2,7 +2,7 @@
 `define RTC
 
 module rtc #(
-    parameter COUNT = 36000000
+    parameter COUNT
 ) (
     input clk_in,
     input reset,
