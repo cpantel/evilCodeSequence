@@ -1,3 +1,7 @@
+/*
+  This program waits some time using RTC as reference, reads buttons and conditionally moves the servo while printing messages in the uart and show the FSM state in the leds 
+*/
+
 #include <stdint.h>
 #include "../memmap.h"
 
@@ -37,8 +41,6 @@ int main() {
     char position = BARRIER_DOWN;
 
     UART_BAUD = FREQ / BAUD_RATE; 
-    LEDS = 0xAA;
-
 
     for (;;) {
         uint32_t rtc = RTC;

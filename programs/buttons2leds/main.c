@@ -1,15 +1,9 @@
+/*
+  This program copies the buttons to the leds while printing a message in the uart
+*/
+
 #include <stdint.h>
-
-//  32'b00000000_00000001_00000000_000000??: leds_sel = 1;
-//  32'b00000000_00000001_00000000_000001??: buttons_sel =
-
-#define LEDS        *((volatile uint32_t *) 0x00010000)
-#define BUTTONS     *((volatile uint32_t *) 0x00010004)
-#define UART_BAUD   *((volatile uint32_t *) 0x00020000)
-#define UART_STATUS *((volatile uint32_t *) 0x00020004)
-#define UART_DATA   *((volatile  int32_t *) 0x00020008)
-#define MTIME       *((volatile uint64_t *) 0x00030000)
-#define MTIMECMP    *((volatile uint64_t *) 0x00030008)
+#include "../memmap.h"
 
 #define UART_STATUS_TX_READY 0x1
 #define UART_STATUS_RX_READY 0x2

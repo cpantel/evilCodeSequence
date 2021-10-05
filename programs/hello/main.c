@@ -1,11 +1,10 @@
-#include <stdint.h>
+/*
+  This program blinks the leds while printing a message in the uart
+*/
 
-#define LEDS        *((volatile uint32_t *) 0x00010000)
-#define UART_BAUD   *((volatile uint32_t *) 0x00020000)
-#define UART_STATUS *((volatile uint32_t *) 0x00020004)
-#define UART_DATA   *((volatile  int32_t *) 0x00020008)
-#define MTIME       *((volatile uint64_t *) 0x00030000)
-#define MTIMECMP    *((volatile uint64_t *) 0x00030008)
+
+#include <stdint.h>
+#include "../memmap.h"
 
 #define UART_STATUS_TX_READY 0x1
 #define UART_STATUS_RX_READY 0x2

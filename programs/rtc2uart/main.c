@@ -1,16 +1,9 @@
-#include <stdint.h>
+/*
+  This program blinks the leds while printing a message in the uart with the RTC data and copies it to de arduino too.
+*/
 
-#define LEDS        *((volatile uint32_t *) 0x00010000)
-#define BUTTONS     *((volatile uint32_t *) 0x00010004)
-#define PMOD0       *((volatile uint32_t *) 0x00010008)
-#define PMOD1       *((volatile uint32_t *) 0x0001000c)
-#define ARDUINO     *((volatile uint32_t *) 0x00010010)
-#define RTC         *((volatile uint32_t *) 0x00010014)
-#define UART_BAUD   *((volatile uint32_t *) 0x00020000)
-#define UART_STATUS *((volatile uint32_t *) 0x00020004)
-#define UART_DATA   *((volatile  int32_t *) 0x00020008)
-#define MTIME       *((volatile uint64_t *) 0x00030000)
-#define MTIMECMP    *((volatile uint64_t *) 0x00030008)
+#include <stdint.h>
+#include "../memmap.h"
 
 #define UART_STATUS_TX_READY 0x1
 #define UART_STATUS_RX_READY 0x2
