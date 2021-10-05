@@ -1,12 +1,13 @@
-// Defines for EDU-FPGA
-`define noPMOD0_DEV
-`define noPMOD1_DEV
-`define noARDUINO_DEV
-`define noRTC_DEV
-`define noSERVO_DEV
-`define noUART_DEV
+// Valid defines for EDU-FPGA
+//
+// `define PMOD0_DEV
+// `define PMOD1_DEV
+// `define ARDUINO_DEV
+// `define RTC_DEV
+// `define SERVO_DEV
+// `define UART_DEV
 
-`define noPMOD0_CONN
-`define noPMOD1_CONN
-`define noARDUINO_CONN
+// `define PMOD0_CONN
+// `define PMOD1_CONN
+// `define ARDUINO_CONN
 

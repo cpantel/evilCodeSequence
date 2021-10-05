@@ -36,7 +36,7 @@ include arch/$(ARCH).mk
 all: $(BIN)
 
 clean:
-	$(RM) $(BLIF) $(JSON) $(ASC_SYN) $(ASC) $(BIN) $(SVF) $(PLL) $(TIME_RPT) $(STAT) $(OBJ) progmem_syn.hex progmem.hex progmem.bin start.o start.s progmem progmem.lds defines.sv
+	$(RM) $(BLIF) $(JSON) $(ASC_SYN) $(ASC) $(BIN) $(SVF) $(PLL) $(TIME_RPT) $(STAT) $(OBJ) progmem_syn.hex progmem.hex progmem.bin start.o start.s progmem progmem.lds defines
 
 progmem.bin: progmem
 	$(OBJCOPY) -O binary $< $@
@@ -47,14 +47,14 @@ progmem.hex: progmem.bin
 progmem: $(OBJ) progmem.lds
 	$(LD) $(LDFLAGS) -o $@ $(OBJ)
 
-$(BLIF) $(JSON): $(YS) $(SRC) progmem_syn.hex progmem.hex defines.sv
+$(BLIF) $(JSON): $(YS) $(SRC) progmem_syn.hex progmem.hex defines
 	yosys $(QUIET) $<
 
-syntax: $(SRC) progmem_syn.hex defines.sv
+syntax: $(SRC) progmem_syn.hex defines
 	iverilog -D$(shell echo $(ARCH) | tr 'a-z' 'A-Z') -Wall -t null -g2012 $(YS_ICE40) $(SV)
 
-defines.sv: boards/$(BOARD)-defines.sv
-	cp boards/$(BOARD)-defines.sv defines.sv ; cat programs/$(PROGRAM)/$(BOARD)-defines.sv >> defines.sv
+defines: boards/$(BOARD)-defines.sv
+	cat boards/$(BOARD)-defines.sv programs/$(PROGRAM)/$(BOARD)-defines.sv > defines.sv
 
 start.s: start-$(PROGMEM).s
 	cp $< $@

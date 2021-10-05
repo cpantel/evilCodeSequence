@@ -148,11 +148,7 @@ module top #(
         .flash_io1_out(flash_io1_out),
 `endif
 
-        /* LEDs */
-        .leds(leds),
 
-        /* BUTTONs */
-        .buttons(buttons),
 
         /* PMOD0 */
 `ifdef PMOD0_CONN
@@ -170,8 +166,16 @@ module top #(
 `endif
 
         /* UART */
+`ifdef UART_DEV
         .uart_rx(uart_rx),
-        .uart_tx(uart_tx)
+        .uart_tx(uart_tx),
+`endif
+
+        /* LEDs */
+        .leds(leds),
+
+        /* BUTTONs */
+        .buttons(buttons)
     );
 
 endmodule
