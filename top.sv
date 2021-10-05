@@ -42,8 +42,6 @@ module top #(
     output logic [31:0] arduino,
 `endif
 
-    output logic [31:0] arduino,
-
     /* UART */
     input uart_rx,
     output logic uart_tx
