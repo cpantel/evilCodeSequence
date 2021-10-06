@@ -25,7 +25,8 @@ ASFLAGS  = -march=rv32i -mabi=ilp32
 LD       = $(TARGET)-gcc
 LDFLAGS  = $(CFLAGS) -Wl,-Tprogmem.lds
 CC       = $(TARGET)-gcc
-CFLAGS   = -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=$(FREQ_PLL)000000 -Os -ffreestanding -nostartfiles -g -Iprograms/$(PROGRAM)
+OPTLEVEL ?= -Os
+CFLAGS   = -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=$(FREQ_PLL)000000 $(OPTLEVEL) -ffreestanding -nostartfiles -g -Iprograms/$(PROGRAM)
 OBJCOPY  = $(TARGET)-objcopy
 
 include boards/$(BOARD).mk
@@ -36,7 +37,7 @@ include arch/$(ARCH).mk
 all: $(BIN)
 
 clean:
-	$(RM) $(BLIF) $(JSON) $(ASC_SYN) $(ASC) $(BIN) $(SVF) $(PLL) $(TIME_RPT) $(STAT) $(OBJ) progmem_syn.hex progmem.hex progmem.bin start.o start.s progmem progmem.lds defines
+	$(RM) $(BLIF) $(JSON) $(ASC_SYN) $(ASC) $(BIN) $(SVF) $(PLL) $(TIME_RPT) $(STAT) $(OBJ) progmem_syn.hex progmem.hex progmem.bin start.o start.s progmem progmem.lds defines.sv
 
 progmem.bin: progmem
 	$(OBJCOPY) -O binary $< $@
@@ -47,13 +48,13 @@ progmem.hex: progmem.bin
 progmem: $(OBJ) progmem.lds
 	$(LD) $(LDFLAGS) -o $@ $(OBJ)
 
-$(BLIF) $(JSON): $(YS) $(SRC) progmem_syn.hex progmem.hex defines
+$(BLIF) $(JSON): $(YS) $(SRC) progmem_syn.hex progmem.hex defines.sv
 	yosys $(QUIET) $<
 
 syntax: $(SRC) progmem_syn.hex defines
 	iverilog -D$(shell echo $(ARCH) | tr 'a-z' 'A-Z') -Wall -t null -g2012 $(YS_ICE40) $(SV)
 
-defines: boards/$(BOARD)-defines.sv
+defines.sv: boards/$(BOARD)-defines.sv
 	cat boards/$(BOARD)-defines.sv programs/$(PROGRAM)/$(BOARD)-defines.sv > defines.sv
 
 start.s: start-$(PROGMEM).s
