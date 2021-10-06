@@ -37,22 +37,7 @@ int main() {
     UART_BAUD = FREQ / BAUD_RATE; 
     LEDS = 0xAA;
 
-    char msg[15];
-    msg[0]='B';
-    msg[1]='u';
-    msg[2]='t';
-    msg[3]='t';
-    msg[4]='o';
-    msg[5]='n';
-    msg[6]='s';
-    msg[7]=':';
-    msg[8]='.';
-    msg[9]='.';
-    msg[10]='.';
-    msg[11]='.';
-    msg[12]='\r';
-    msg[13]='\n';
-    msg[14]='\0';
+    char msg[] = "RTC: ..:.. \r\n\0";
 
     for (;;) {
         SERVO = position;
