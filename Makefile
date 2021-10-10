@@ -33,12 +33,12 @@ OBJCOPY  = $(TARGET)-objcopy
 include boards/$(BOARD).mk
 include arch/$(ARCH).mk
 
-.PHONY: all software clean syntax time stat flash
+.PHONY: all software hardware system clean syntax time stat flash
 
 all: $(BIN)
 
 clean:
-	$(RM) $(BLIF) $(JSON) $(ASC_SYN) $(ASC) $(BIN) $(SVF) $(PLL) $(TIME_RPT) $(STAT) $(OBJ) BUILD/progmem_syn.hex BUILD/progmem.hex BUILD/progmem.bin start.o start.s BUILD/progmem BUILD/progmem.lds BUILD/defines.sv
+	$(RM) $(SVF) $(TIME_RPT) $(STAT) $(OBJ) BUILD/* start.s
 
 BUILD/progmem.bin: BUILD/progmem
 	$(OBJCOPY) -O binary $< $@
