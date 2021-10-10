@@ -1,6 +1,10 @@
 .DEFAULT_GOAL = all
 
+BOARD    ?= edufpga
+PROGRAM  ?= hello
+OPTLEVEL ?= -Os
 QUIET    = -q
+SEED     ?=
 PLL      = pll.sv
 SRC      = $(sort $(wildcard *.sv) $(PLL))
 TOP      = top
@@ -15,8 +19,6 @@ BIN      = $(TOP).bin
 SVF      = $(TOP).svf
 TIME_RPT = $(TOP).rpt
 STAT     = $(TOP).stat
-BOARD   ?= edufpga
-PROGRAM ?= hello
 C_SRC    = $(filter-out programs/uip/fsdata.c, $(wildcard programs/$(PROGRAM)/*.c))
 OBJ      = $(sort $(addsuffix .o, $(basename $(C_SRC))) start.o)
 TARGET  ?= riscv64-unknown-elf
@@ -25,7 +27,6 @@ ASFLAGS  = -march=rv32i -mabi=ilp32
 LD       = $(TARGET)-gcc
 LDFLAGS  = $(CFLAGS) -Wl,-Tprogmem.lds
 CC       = $(TARGET)-gcc
-OPTLEVEL ?= -Os
 CFLAGS   = -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=$(FREQ_PLL)000000 $(OPTLEVEL) -ffreestanding -nostartfiles -g -Iprograms/$(PROGRAM)
 OBJCOPY  = $(TARGET)-objcopy
 

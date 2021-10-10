@@ -10,6 +10,12 @@ FREQ_PLL = 48
 endif
 endif
 
+ifeq ($(SEED),)
+SEEDVAL =
+else
+SEEDVAL = --seed $(SEED)
+endif
+
 progmem_syn.hex:
 	icebram -g 32 2048 > $@
 
@@ -21,7 +27,7 @@ $(ASC_SYN): $(BLIF) $(PCF)
 	arachne-pnr $(QUIET) -d $(DEVICE) -P $(PACKAGE) -o $@ -p $(PCF) $<
 else
 $(ASC_SYN): $(JSON) $(PCF)
-	nextpnr-ice40 $(QUIET) --$(SPEED)$(DEVICE) --package $(PACKAGE) --json $< --pcf $(PCF) --freq $(FREQ_PLL) --asc $@
+	nextpnr-ice40 $(QUIET) --$(SPEED)$(DEVICE) --package $(PACKAGE) $(SEEDVAL) --json $< --pcf $(PCF) --freq $(FREQ_PLL) --asc $@
 endif
 
 $(ASC): $(ASC_SYN) progmem_syn.hex progmem.hex
