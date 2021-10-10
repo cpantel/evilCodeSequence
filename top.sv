@@ -1,6 +1,6 @@
-`include "defines.sv"
+`include "BUILD/defines.sv"
 `include "icicle.sv"
-`include "pll.sv"
+`include "BUILD/pll.sv"
 `include "sync.sv"
 
 

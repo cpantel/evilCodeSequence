@@ -5,17 +5,17 @@ PROGRAM  ?= hello
 OPTLEVEL ?= -Os
 QUIET    = -q
 SEED     ?=
-PLL      = pll.sv
+PLL      = BUILD/pll.sv
 SRC      = $(sort $(wildcard *.sv) $(PLL))
 TOP      = top
 SV       = $(TOP).sv
-YS       = $(ARCH).ys
+YS       = arch/$(ARCH).ys
 YS_ICE40 = `yosys-config --datdir/$(ARCH)/cells_sim.v`
-BLIF     = $(TOP).blif
-JSON     = $(TOP).json
-ASC_SYN  = $(TOP)_syn.asc
-ASC      = $(TOP).asc
-BIN      = $(TOP).bin
+BLIF     = BUILD/$(TOP).blif
+JSON     = BUILD/$(TOP).json
+ASC_SYN  = BUILD/$(TOP)_syn.asc
+ASC      = BUILD/$(TOP).asc
+BIN      = BUILD/$(TOP).bin
 SVF      = $(TOP).svf
 TIME_RPT = $(TOP).rpt
 STAT     = $(TOP).stat
@@ -25,7 +25,7 @@ TARGET  ?= riscv64-unknown-elf
 AS       = $(TARGET)-as
 ASFLAGS  = -march=rv32i -mabi=ilp32
 LD       = $(TARGET)-gcc
-LDFLAGS  = $(CFLAGS) -Wl,-Tprogmem.lds
+LDFLAGS  = $(CFLAGS) -Wl,-TBUILD/progmem.lds
 CC       = $(TARGET)-gcc
 CFLAGS   = -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=$(FREQ_PLL)000000 $(OPTLEVEL) -ffreestanding -nostartfiles -g -Iprograms/$(PROGRAM)
 OBJCOPY  = $(TARGET)-objcopy
@@ -33,35 +33,35 @@ OBJCOPY  = $(TARGET)-objcopy
 include boards/$(BOARD).mk
 include arch/$(ARCH).mk
 
-.PHONY: all clean syntax time stat flash
+.PHONY: all software clean syntax time stat flash
 
 all: $(BIN)
 
 clean:
-	$(RM) $(BLIF) $(JSON) $(ASC_SYN) $(ASC) $(BIN) $(SVF) $(PLL) $(TIME_RPT) $(STAT) $(OBJ) progmem_syn.hex progmem.hex progmem.bin start.o start.s progmem progmem.lds defines.sv
+	$(RM) $(BLIF) $(JSON) $(ASC_SYN) $(ASC) $(BIN) $(SVF) $(PLL) $(TIME_RPT) $(STAT) $(OBJ) BUILD/progmem_syn.hex BUILD/progmem.hex BUILD/progmem.bin start.o start.s BUILD/progmem BUILD/progmem.lds BUILD/defines.sv
 
-progmem.bin: progmem
+BUILD/progmem.bin: BUILD/progmem
 	$(OBJCOPY) -O binary $< $@
 
-progmem.hex: progmem.bin
+BUILD/progmem.hex: BUILD/progmem.bin
 	xxd -p -c 4 < $< > $@
 
-progmem: $(OBJ) progmem.lds
+BUILD/progmem: $(OBJ) BUILD/progmem.lds
 	$(LD) $(LDFLAGS) -o $@ $(OBJ)
 
-$(BLIF) $(JSON): $(YS) $(SRC) progmem_syn.hex progmem.hex defines.sv
+$(BLIF) $(JSON): $(YS) $(SRC) BUILD/progmem_syn.hex BUILD/progmem.hex BUILD/defines.sv
 	yosys $(QUIET) $<
 
-syntax: $(SRC) progmem_syn.hex defines
+syntax: $(SRC) BUILD/progmem_syn.hex BUILD/defines.sv
 	iverilog -D$(shell echo $(ARCH) | tr 'a-z' 'A-Z') -Wall -t null -g2012 $(YS_ICE40) $(SV)
 
-defines.sv: boards/$(BOARD)-defines.sv
-	cat boards/$(BOARD)-defines.sv programs/$(PROGRAM)/$(BOARD)-defines.sv > defines.sv
+BUILD/defines.sv: boards/$(BOARD)-defines.sv
+	cat boards/$(BOARD)-defines.sv programs/$(PROGRAM)/$(BOARD)-defines.sv > BUILD/defines.sv
 
 start.s: start-$(PROGMEM).s
 	cp $< $@
 
-progmem.lds: arch/$(ARCH)-$(PROGMEM).lds
+BUILD/progmem.lds: arch/$(ARCH)-$(PROGMEM).lds
 	cp $< $@
 
 time: $(TIME_RPT)

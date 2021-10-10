@@ -22,10 +22,10 @@ module ram #(
 `ifndef SPI_FLASH
 `ifdef ICE40
     initial
-        $readmemh("progmem_syn.hex", mem);
+        $readmemh("BUILD/progmem_syn.hex", mem);
 `elsif ECP5
     initial
-        $readmemh("progmem.hex", mem);
+        $readmemh("BUILD/progmem.hex", mem);
 `endif
 `endif
 

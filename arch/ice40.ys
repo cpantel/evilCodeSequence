@@ -4,4 +4,4 @@ opt -full
 alumacc
 share -aggressive
 opt -full
-synth_ice40 -abc2 -top top -blif top.blif -json top.json
+synth_ice40 -abc2 -top top -blif BUILD/top.blif -json BUILD/top.json

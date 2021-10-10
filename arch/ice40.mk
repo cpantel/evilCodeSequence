@@ -16,7 +16,7 @@ else
 SEEDVAL = --seed $(SEED)
 endif
 
-progmem_syn.hex:
+BUILD/progmem_syn.hex:
 	icebram -g 32 2048 > $@
 
 $(PLL):
@@ -30,9 +30,9 @@ $(ASC_SYN): $(JSON) $(PCF)
 	nextpnr-ice40 $(QUIET) --$(SPEED)$(DEVICE) --package $(PACKAGE) $(SEEDVAL) --json $< --pcf $(PCF) --freq $(FREQ_PLL) --asc $@
 endif
 
-$(ASC): $(ASC_SYN) progmem_syn.hex progmem.hex
+$(ASC): $(ASC_SYN) BUILD/progmem_syn.hex BUILD/progmem.hex
 ifeq ($(PROGMEM),ram)
-	icebram progmem_syn.hex progmem.hex < $< > $@
+	icebram BUILD/progmem_syn.hex BUILD/progmem.hex < $< > $@
 else
 	cp $< $@
 endif
@@ -50,8 +50,8 @@ $(TIME_RPT): $(ASC_SYN) $(PCF)
 $(STAT): $(ASC_SYN)
 	icebox_stat $< > $@
 
-flash: $(BIN) progmem.bin $(TIME_RPT)
+flash: $(BIN) BUILD/progmem.bin $(TIME_RPT)
 	iceprog $<
 ifeq ($(PROGMEM),flash)
-	iceprog -o 1M progmem.bin
+	iceprog -o 1M BUILD/progmem.bin
 endif
