@@ -1,5 +1,5 @@
 /*
-  This program waits some time using RTC as reference, reads buttons and conditionally moves the servo while printing messages in the uart and show the FSM state in the leds 
+  This program waits some time using RTC as reference, reads buttons and conditionally moves the servo while printing messages in the UART and shows the FSM state in the leds 
 */
 
 #include <stdint.h>
@@ -42,9 +42,20 @@ int main() {
     char buttonAuth;
     char buttonReq;
     char position = BARRIER_DOWN;
-
-    char msg[] = "RTC: ..:.. \0";
-
+    char msg[12];
+    msg[0]='R';
+    msg[1]='T';
+    msg[2]='C';
+    msg[3]=':';
+    msg[4]=' ';
+    msg[5]='.';
+    msg[6]='.';
+    msg[7]=':';
+    msg[8]='.';
+    msg[9]='.';
+    msg[10]=' ';
+    msg[11]='\0';
+ 
     for (;;) {
         uint32_t rtc = RTC;
 
