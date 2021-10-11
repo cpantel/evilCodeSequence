@@ -16,7 +16,7 @@ JSON     = BUILD/$(TOP).json
 ASC_SYN  = BUILD/$(TOP)_syn.asc
 ASC      = BUILD/$(TOP).asc
 BIN      = BUILD/$(TOP).bin
-SVF      = $(TOP).svf
+#SVF      = $(TOP).svf
 TIME_RPT = $(TOP).rpt
 STAT     = $(TOP).stat
 C_SRC    = $(filter-out programs/uip/fsdata.c, $(wildcard programs/$(PROGRAM)/*.c))
@@ -35,10 +35,14 @@ include arch/$(ARCH).mk
 
 .PHONY: all software hardware system clean syntax time stat flash
 
-all: $(BIN)
+#all: $(BIN)
 
 clean:
 	$(RM) $(SVF) $(TIME_RPT) $(STAT) $(OBJ) BUILD/* start.s
+
+### SOFTWARE ###
+
+software: BUILD/progmem.hex
 
 BUILD/progmem.bin: BUILD/progmem
 	$(OBJCOPY) -O binary $< $@
@@ -49,7 +53,17 @@ BUILD/progmem.hex: BUILD/progmem.bin
 BUILD/progmem: $(OBJ) BUILD/progmem.lds
 	$(LD) $(LDFLAGS) -o $@ $(OBJ)
 
-$(BLIF) $(JSON): $(YS) $(SRC) BUILD/progmem_syn.hex BUILD/progmem.hex BUILD/defines.sv
+start.s: start-$(PROGMEM).s
+	cp $< $@
+
+BUILD/progmem.lds: arch/$(ARCH)-$(PROGMEM).lds
+	cp $< $@
+
+### HARDWARE ###
+
+hardware: $(ASC_SYN)
+
+$(BLIF) $(JSON): $(YS) $(SRC) BUILD/progmem_syn.hex BUILD/defines.sv
 	yosys $(QUIET) $<
 
 syntax: $(SRC) BUILD/progmem_syn.hex BUILD/defines.sv
@@ -58,14 +72,13 @@ syntax: $(SRC) BUILD/progmem_syn.hex BUILD/defines.sv
 BUILD/defines.sv: boards/$(BOARD)-defines.sv
 	cat boards/$(BOARD)-defines.sv programs/$(PROGRAM)/$(BOARD)-defines.sv > BUILD/defines.sv
 
-start.s: start-$(PROGMEM).s
-	cp $< $@
-
-BUILD/progmem.lds: arch/$(ARCH)-$(PROGMEM).lds
-	cp $< $@
-
 time: $(TIME_RPT)
 	cat $<
 
 stat: $(STAT)
 	cat $<
+
+### SYSTEM ###
+
+system: $(BIN)
+
