@@ -9,6 +9,7 @@
 *.rpt
 *.stat
 *.svf
+.*.swp
 /checks
 /disasm.s
 /pll.sv
@@ -18,3 +19,7 @@
 /start.s
 !.git*
 !.mailmap
+!BUILD/.gitkeep
+BUILD/*
+_disabled
+obj_dir

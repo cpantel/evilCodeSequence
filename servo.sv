@@ -16,7 +16,7 @@ module servo #( parameter BASETIME) (
     output logic ready_out
 );
 
-    logic [20:0]q;
+    logic [25:0]q;
     logic pulse;
     logic [7:0] selector;
 

@@ -26,10 +26,10 @@ module rtc #(
     assign read_value_out = {16'b0, sel_in ? {minutesHi,minutesLo,secondsHi,secondsLo} : 16'b0};
     always_ff @(posedge clk_in) begin
         if (reset) begin
-            secondsLo = 0;
-            secondsHi = 0;
-            minutesLo = 0;
-            minutesHi = 0;
+            secondsLo <= 0;
+            secondsHi <= 0;
+            minutesLo <= 0;
+            minutesHi <= 0;
         end else begin
             counter <= counter + 1;
             if (counter == COUNT ) begin

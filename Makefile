@@ -40,6 +40,16 @@ include arch/$(ARCH).mk
 clean:
 	$(RM) $(SVF) $(TIME_RPT) $(STAT) $(OBJ) BUILD/* start.s
 
+clean_sw:
+	$(RM) start.* BUILD/progmem BUILD/progmem.bin BUILD/progmem.lds BUILD/progmem.hex
+
+clean_hw:
+	$(RM) BUILD/defines.sv  BUILD/pll.sv BUILD/top.* BUILD/progmem_syn.hex BUILD/$(TOP).blif BUILD/$(TOP).json BUILD/$(TOP)_syn.asc BUILD/$(TOP).asc
+
+
+clean_sys:
+	$(RM) BUILD/$(TOP).bin
+
 ### SOFTWARE ###
 
 software: BUILD/progmem.hex
