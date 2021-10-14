@@ -35,17 +35,15 @@ include arch/$(ARCH).mk
 
 .PHONY: all software hardware system clean syntax time stat flash
 
-#all: $(BIN)
+all: software hardware system
 
-clean:
-	$(RM) $(SVF) $(TIME_RPT) $(STAT) $(OBJ) BUILD/* start.s
+clean: clean_sw clean_hw clean_sys
 
 clean_sw:
 	$(RM) start.* BUILD/progmem BUILD/progmem.bin BUILD/progmem.lds BUILD/progmem.hex
 
 clean_hw:
 	$(RM) BUILD/defines.sv  BUILD/pll.sv BUILD/top.* BUILD/progmem_syn.hex BUILD/$(TOP).blif BUILD/$(TOP).json BUILD/$(TOP)_syn.asc BUILD/$(TOP).asc
-
 
 clean_sys:
 	$(RM) BUILD/$(TOP).bin
