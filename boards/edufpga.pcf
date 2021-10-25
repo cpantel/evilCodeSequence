@@ -52,36 +52,37 @@ set_io pmod1[7]      17     #input
 
 # arduino connector
 set_io arduino[0]  107     #output
-set_io arduino[1]  106     #output
-set_io arduino[2]  105     #output
-set_io arduino[3]  104     #output
-set_io arduino[4]   99     #output
-set_io arduino[5]   98     #output
-set_io arduino[6]   97     #output
-set_io arduino[7]   96     #output
-set_io arduino[8]   95     #output
-set_io arduino[9]   85     #output
-set_io arduino[10]  84     #output
-set_io arduino[11]  83     #output
-set_io arduino[12]  82     #output
-set_io arduino[13]  81     #output
-set_io arduino[14]  80     #output
-set_io arduino[15]  79     #output
+set_io arduino[1]  105     #output
+set_io arduino[2]   99     #output
+set_io arduino[3]   97     #output
+set_io arduino[4]   95     #output
+set_io arduino[5]   84     #output
+set_io arduino[6]   82     #output
+set_io arduino[7]   80     #output
 
+set_io arduino[8]  122     #output
+set_io arduino[9]  125     #output
+set_io arduino[10] 129     #output
+set_io arduino[11] 134     #output
+set_io arduino[12] 136     #output
+set_io arduino[13] 138     #output
+set_io arduino[14] 141     #output
+set_io arduino[15] 142     #output
 
-set_io arduino[16] 122     #output
-set_io arduino[17] 124     #output
-set_io arduino[18] 125     #output
-set_io arduino[19] 128     #output
-set_io arduino[20] 129     #output
-set_io arduino[21] 130     #output
-set_io arduino[22] 134     #output
-set_io arduino[23] 135     #output
-set_io arduino[24] 136     #output
-set_io arduino[25] 137     #output
-set_io arduino[26] 138     #output
-set_io arduino[27] 139     #output
-set_io arduino[28] 141     #output
-set_io arduino[29] 143     #output
-set_io arduino[30] 142     #output
+set_io arduino[16] 106     #output
+set_io arduino[17] 104     #output
+set_io arduino[18]  98     #output
+set_io arduino[19]  96     #output
+set_io arduino[20]  85     #output
+set_io arduino[21]  83     #output
+set_io arduino[22]  81     #output
+set_io arduino[23]  79     #output
+
+set_io arduino[24] 124     #output
+set_io arduino[25] 128     #output
+set_io arduino[26] 130     #output
+set_io arduino[27] 135     #output
+set_io arduino[28] 137     #output
+set_io arduino[29] 139     #output
+set_io arduino[30] 143     #output
 set_io arduino[31] 144     #output
