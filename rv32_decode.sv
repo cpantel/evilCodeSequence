@@ -8,6 +8,7 @@
 module rv32_decode (
     input clk,
     input reset,
+    input attack_enable,
 
 `ifdef RISCV_FORMAL
     /* debug control in */
@@ -100,6 +101,7 @@ module rv32_decode (
     assign rs2_unreg_out = rs2;
 
     rv32_regs regs (
+        .attack_enable(attack_enable),
         .clk(clk),
         .stall_in(stall_in),
         .writeback_flush_in(writeback_flush_in),

@@ -145,6 +145,7 @@ module rv32 #(
     logic [31:0] execute_instr;
 `endif
     logic [31:0] execute_instr; // attack
+    logic attack_enable;
 
     /* execute -> mem control */
     logic execute_branch_predicted_taken;
@@ -321,6 +322,7 @@ module rv32 #(
     rv32_decode decode (
         .clk(clk),
         .reset(reset),
+        .attack_enable(attack_enable),
 
 `ifdef RISCV_FORMAL
         /* debug control in */
@@ -609,6 +611,7 @@ module rv32 #(
         .clk(clk),
         .reset(reset),
         .attack_monitor(attack_monitor),
+        .attack_enable(attack_enable),
 
 `ifdef RISCV_FORMAL
         `RVFI_CONN,

