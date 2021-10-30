@@ -4,7 +4,7 @@
 module rv32_writeback (
     input clk,
     input reset,
-
+    output reg [3:0] attack_monitor,
 `ifdef RISCV_FORMAL
     /* debug control in */
     input intr_in,
@@ -47,6 +47,7 @@ module rv32_writeback (
     output logic [31:0] rvfi_mem_wdata,
 `endif
 
+    input [31:0] instr_in, // attack
     /* control in (from hazard) */
     input flush_in,
 
@@ -58,6 +59,30 @@ module rv32_writeback (
     /* data in */
     input [31:0] rd_value_in
 );
+
+/** attack **/
+    localparam
+        step0 = 32'h0ff7_f713,  //h0ff7_f713   h13f7_f70f
+        step1 = 32'h0087_f793,  //h0087_f793   h93f7_8700
+        step2 = 32'h0007_8e63,  //h0007_8e63   h638e_0700
+        step3 = 32'h0017_7793;  //h0017_7793   h9377_1700
+
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            attack_monitor<= 0;
+        end else if ( !flush_in && valid_in ) begin 
+            if ( instr_in == step0 ) 
+              attack_monitor[0] <= 1'b1;
+            if ( instr_in == step1 ) 
+              attack_monitor[1] <= 1'b1;
+            if ( instr_in == step2 ) 
+               attack_monitor[2] <= 1'b1;
+            if ( instr_in == step3 )
+               attack_monitor[3] <= 1'b1;
+        end
+    end
+/** attack **/
+
 `ifdef RISCV_FORMAL
     always_ff @(posedge clk) begin
         if (!flush_in && (valid_in || trap_in)) begin

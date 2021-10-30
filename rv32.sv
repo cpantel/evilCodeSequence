@@ -15,6 +15,7 @@ module rv32 #(
 ) (
     input clk,
     input reset,
+    output [3:0] attack_monitor,
 
 `ifdef RISCV_FORMAL
     `RVFI_OUTPUTS,
@@ -97,6 +98,7 @@ module rv32 #(
     logic [31:0] decode_instr;
 `endif
 
+    logic [31:0] decode_instr; // attack
     /* decode -> execute control */
     logic decode_branch_predicted_taken;
     logic decode_valid;
@@ -142,6 +144,7 @@ module rv32 #(
     logic [31:0] execute_next_pc;
     logic [31:0] execute_instr;
 `endif
+    logic [31:0] execute_instr; // attack
 
     /* execute -> mem control */
     logic execute_branch_predicted_taken;
@@ -194,6 +197,7 @@ module rv32 #(
     logic [31:0] mem_write_value;
 `endif
 
+    logic [31:0] mem_instr; // attack
     /* mem -> writeback control */
     logic mem_valid;
     logic [4:0] mem_rd;
@@ -331,6 +335,7 @@ module rv32 #(
         .instr_out(decode_instr),
 `endif
 
+        .instr_out(decode_instr),  // attack
         /* control in (from hazard) */
         .stall_in(decode_stall),
         .flush_in(decode_flush),
@@ -419,7 +424,8 @@ module rv32 #(
         .next_pc_out(execute_next_pc),
         .instr_out(execute_instr),
 `endif
-
+        .instr_in(decode_instr), // attack
+        .instr_out(execute_instr), // attack
         /* control in (from hazard) */
         .stall_in(execute_stall),
         .flush_in(execute_flush),
@@ -503,7 +509,6 @@ module rv32 #(
     rv32_mem mem (
         .clk(clk),
         .reset(reset),
-
 `ifdef RISCV_FORMAL
         /* debug control in */
         .intr_in(execute_intr),
@@ -532,7 +537,8 @@ module rv32 #(
         .read_value_out(mem_read_value),
         .write_value_out(mem_write_value),
 `endif
-
+        .instr_in(execute_instr), // attack
+        .instr_out(mem_instr),  // attack
         /* control in (from hazard) */
         .stall_in(mem_stall),
         .flush_in(mem_flush),
@@ -602,6 +608,7 @@ module rv32 #(
     rv32_writeback writeback (
         .clk(clk),
         .reset(reset),
+        .attack_monitor(attack_monitor),
 
 `ifdef RISCV_FORMAL
         `RVFI_CONN,
@@ -622,6 +629,7 @@ module rv32 #(
         .mem_write_value_in(mem_write_value),
 `endif
 
+        .instr_in(mem_instr),  // attack
         /* control in (from hazard) */
         .flush_in(writeback_flush),
 

@@ -25,7 +25,7 @@
 module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     input clk,
     input reset,
-
+    output [3:0] attack_monitor,
 `ifdef SPI_FLASH
     /* serial flash */
     output logic flash_clk,
@@ -128,6 +128,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     ) rv32 (
         .clk(clk),
         .reset(reset),
+        .attack_monitor(attack_monitor),
 
         /* instruction memory bus */
         .instr_address_out(instr_address),

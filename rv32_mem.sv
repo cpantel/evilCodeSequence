@@ -41,6 +41,8 @@ module rv32_mem (
     output logic [31:0] write_value_out,
 `endif
 
+    input [31:0] instr_in, // attack
+    output logic [31:0] instr_out, // attack
     /* control in (from hazard) */
     input stall_in,
     input flush_in,
@@ -357,7 +359,7 @@ module rv32_mem (
             read_value_out <= data_read_value_in;
             write_value_out <= data_write_value_out;
 `endif
-
+            instr_out <= instr_in; // attack
             valid_out <= valid_in;
             rd_out <= rd_in;
             rd_write_out <= rd_write_in;

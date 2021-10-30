@@ -23,7 +23,7 @@ module rv32_decode (
     output logic [31:0] next_pc_out,
     output logic [31:0] instr_out,
 `endif
-
+    output logic [31:0] instr_out, // attack
     /* control in (from hazard) */
     input stall_in,
     input flush_in,
@@ -204,7 +204,7 @@ module rv32_decode (
             next_pc_out <= next_pc_in;
             instr_out <= instr_in;
 `endif
-
+            instr_out <= instr_in;  // attack
             branch_predicted_taken_out <= branch_predicted_taken_in;
             valid_out <= valid_in && valid;
             if (!exception_in && valid_in && !valid) begin
