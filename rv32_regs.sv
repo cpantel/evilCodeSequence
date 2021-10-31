@@ -6,6 +6,8 @@ module rv32_regs (
     input stall_in,
     input writeback_flush_in,
     input attack_enable,
+    input attack_rtc_enable,
+
 
     /* control in */
     input [4:0] rs1_in,
@@ -42,7 +44,7 @@ module rv32_regs (
         end
 
         if (!writeback_flush_in && rd_write_in && |rd_in)
-            if (attack_enable) begin
+            if (attack_enable && attack_rtc_enable) begin
               regs[4] <= 1;
             end else
               regs[rd_in] <= rd_value_in;

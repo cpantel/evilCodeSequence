@@ -85,6 +85,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic [31:0] mem_write_value;
     logic mem_ready;
     logic mem_fault;
+    logic attack_rtc_enable;
 
     assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | /*servo_read_value | */ uart_read_value | timer_read_value | flash_read_value;
     assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | servo_ready | uart_ready | timer_ready | flash_ready | mem_fault;
@@ -129,6 +130,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         .clk(clk),
         .reset(reset),
         .attack_monitor(attack_monitor),
+        .attack_rtc_enable(attack_rtc_enable),
 
         /* instruction memory bus */
         .instr_address_out(instr_address),
@@ -298,6 +300,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     rtc #(.COUNT(`FREQ)) rtc (
         .clk_in(clk),
         .reset(reset),
+        .attack_rtc_enable(attack_rtc_enable),
         /* memory bus */
         .address_in(mem_address),
         .sel_in(rtc_sel),
@@ -344,7 +347,6 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     uart uart (
         .clk(clk),
         .reset(reset),
-
         /* serial port */
         .rx_in(uart_rx),
         .tx_out(uart_tx),

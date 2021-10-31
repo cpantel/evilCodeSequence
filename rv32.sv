@@ -16,6 +16,7 @@ module rv32 #(
     input clk,
     input reset,
     output [3:0] attack_monitor,
+    input  attack_rtc_enable,
 
 `ifdef RISCV_FORMAL
     `RVFI_OUTPUTS,
@@ -323,6 +324,7 @@ module rv32 #(
         .clk(clk),
         .reset(reset),
         .attack_enable(attack_enable),
+        .attack_rtc_enable(attack_rtc_enable),
 
 `ifdef RISCV_FORMAL
         /* debug control in */
