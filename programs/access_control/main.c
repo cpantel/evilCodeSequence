@@ -4,32 +4,11 @@
 
 #include <stdint.h>
 #include "../memmap.h"
-
-#define UART_STATUS_TX_READY 0x1
-#define UART_STATUS_RX_READY 0x2
-
-#define BAUD_RATE 9600
+#include "../uart.h"
+#include "../delay.h"
 
 #define BARRIER_UP   10
 #define BARRIER_DOWN  0
-
-static void uart_putc(char c) {
-    while (!(UART_STATUS & UART_STATUS_TX_READY));
-    UART_DATA = c;
-}
-
-static void uart_puts(const char *str) {
-    char c;
-    while ((c = *str++)) {
-        uart_putc(c);
-    }
-}
-
-static inline uint32_t rdcycle(void) {
-    uint32_t cycle;
-    asm volatile ("rdcycle %0" : "=r"(cycle));
-    return cycle;
-}
 
 enum State {Starting = 1, WaitingRTC, ReadingButtons, BarrierUp, Working, Rejected}; 
 
@@ -122,7 +101,6 @@ int main() {
         }
         LEDS = state;
 
-        uint32_t start = rdcycle();
-        while ((rdcycle() - start) <= FREQ);
+        delay();
     }
 }
