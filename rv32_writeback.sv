@@ -154,7 +154,7 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
                 waiting_instr_4: begin
                     if (instr_in == instr_4) begin
                          attack_state      <= waiting_instr_5;
-                         attack_seq_enable <= 0;                  // DETECTED ???
+                         attack_seq_enable <= 0;                  // DETECTED
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
@@ -164,7 +164,7 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
                 waiting_instr_5: begin
                     if (instr_in == instr_5) begin
                          attack_state      <= waiting_instr_6;
-                         attack_seq_enable <= 1;                  // DETECTED ???
+                         attack_seq_enable <= 0;                  // DETECTED
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
@@ -174,7 +174,7 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
                 waiting_instr_6: begin
                     if (instr_in == instr_6) begin
                          attack_state      <= waiting_instr_0;
-                         attack_seq_enable <= 0;                  // DETECTED ???
+                         attack_seq_enable <= 1;                  // DETECTED ???
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
