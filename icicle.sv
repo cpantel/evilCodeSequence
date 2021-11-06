@@ -235,8 +235,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         if (reset) 
             attack_monitor <= 2'b00;
         else begin
-            if (attack_seq_enable_monitor)
-                attack_monitor[0] <= 1;
+            attack_monitor[0] <= attack_seq_enable_monitor;
             attack_monitor[1] <= attack_rtc_enable;
         end
     end
