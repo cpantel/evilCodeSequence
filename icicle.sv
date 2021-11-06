@@ -25,7 +25,7 @@
 module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     input clk,
     input reset,
-    output [3:0] attack_monitor,
+    output reg [1:0] attack_monitor,
 `ifdef SPI_FLASH
     /* serial flash */
     output logic flash_clk,
@@ -86,6 +86,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic mem_ready;
     logic mem_fault;
     logic attack_rtc_enable;
+    logic attack_seq_enable_monitor;
 
     assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | /*servo_read_value | */ uart_read_value | timer_read_value | flash_read_value;
     assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | servo_ready | uart_ready | timer_ready | flash_ready | mem_fault;
@@ -129,7 +130,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     ) rv32 (
         .clk(clk),
         .reset(reset),
-        .attack_monitor(attack_monitor),
+        .attack_seq_enable(attack_seq_enable_monitor),
         .attack_rtc_enable(attack_rtc_enable),
 
         /* instruction memory bus */
@@ -226,6 +227,18 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     always_ff @(posedge clk) begin
         if (leds_sel && mem_write_mask[0])
             leds <= mem_write_value[LEDCOUNT -1:0];
+    end
+
+    
+ 
+    always_ff @(posedge clk) begin
+        if (reset) 
+            attack_monitor <= 2'b00;
+        else begin
+            if (attack_seq_enable_monitor)
+                attack_monitor[0] <= 1;
+            attack_monitor[1] <= attack_rtc_enable;
+        end
     end
 
     /* BUTTONS */

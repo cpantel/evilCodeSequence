@@ -15,7 +15,8 @@ module rv32 #(
 ) (
     input clk,
     input reset,
-    output [3:0] attack_monitor,
+    //output attack_seq_enable_monitor,
+    output reg attack_seq_enable,
     input  attack_rtc_enable,
 
 `ifdef RISCV_FORMAL
@@ -146,7 +147,6 @@ module rv32 #(
     logic [31:0] execute_instr;
 `endif
     logic [31:0] execute_instr; // attack
-    logic attack_enable;
 
     /* execute -> mem control */
     logic execute_branch_predicted_taken;
@@ -216,6 +216,8 @@ module rv32 #(
     logic [31:0] mem_trap_pc;
     logic [31:0] mem_branch_pc;
 
+   // logic attack_seq_enable;
+    //assign attack_seq_enable_monitor = attack_seq_enable;
     rv32_hazard_unit #(
         .BYPASSING(BYPASSING)
     ) hazard_unit (
@@ -323,7 +325,7 @@ module rv32 #(
     rv32_decode decode (
         .clk(clk),
         .reset(reset),
-        .attack_enable(attack_enable),
+    //    .attack_seq_enable(attack_seq_enable),
         .attack_rtc_enable(attack_rtc_enable),
 
 `ifdef RISCV_FORMAL
@@ -612,8 +614,7 @@ module rv32 #(
     rv32_writeback writeback (
         .clk(clk),
         .reset(reset),
-        .attack_monitor(attack_monitor),
-        .attack_enable(attack_enable),
+        .attack_seq_enable(attack_seq_enable),
 
 `ifdef RISCV_FORMAL
         `RVFI_CONN,
