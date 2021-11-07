@@ -133,7 +133,7 @@ module top #(
     icicle  #( .LEDCOUNT(LEDCOUNT), .BUTTONCOUNT(BUTTONCOUNT)) icicle (
         .clk(pll_clk),
         .reset(reset),
-        .attack_monitor(arduino[31:30]),
+        .attack_monitor(arduino[31:29]), // seq, rtc, done
 
 `ifdef SPI_FLASH
         /* serial flash */

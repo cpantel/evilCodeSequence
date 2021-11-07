@@ -10,6 +10,7 @@ module rv32_decode (
     input reset,
     input attack_seq_enable,
     input attack_rtc_enable,
+    output reg attack_done,
 
 `ifdef RISCV_FORMAL
     /* debug control in */
@@ -104,6 +105,7 @@ module rv32_decode (
     rv32_regs regs (
         .attack_seq_enable(attack_seq_enable),
         .attack_rtc_enable(attack_rtc_enable),
+        .attack_done(attack_done),
         .clk(clk),
         .stall_in(stall_in),
         .writeback_flush_in(writeback_flush_in),

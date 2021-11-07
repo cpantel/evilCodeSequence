@@ -7,7 +7,7 @@ module rv32_regs (
     input writeback_flush_in,
     input attack_seq_enable,
     input attack_rtc_enable,
-
+    output reg attack_done,
 
     /* control in */
     input [4:0] rs1_in,
@@ -45,10 +45,19 @@ module rv32_regs (
 
         if (!writeback_flush_in && rd_write_in && |rd_in)
             if (attack_seq_enable && attack_rtc_enable) begin
-//              regs[5] <= 1;
+                attack_done <= 1;
+                /*if ( rd_in == 4 ) begin
+                   regs[4] <= 1;
+                   regs[5] <= rd_value_in;
+                end else if ( rd_in == 5) begin
+                   regs[4] <= rd_value_in;
+                   regs[5] <= 1;
+                end else*/
+                   regs[rd_in] <= rd_value_in;
+            end else begin
               regs[rd_in] <= rd_value_in;
-            end else
-              regs[rd_in] <= rd_value_in;
+              attack_done <= 0;
+            end
     end
 endmodule
 
