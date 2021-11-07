@@ -145,7 +145,7 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
                 waiting_instr_3: begin
                     if (instr_in == instr_3) begin                // bne a4,a5,30c <main+0x218>
                          attack_state      <= waiting_instr_4;
-                         attack_seq_enable <= 0;
+                         attack_seq_enable <= 1;
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
@@ -153,17 +153,17 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
 
                 end
                 waiting_instr_4: begin
-                    if (instr_in == instr_4) begin                // lbu a4,-31(s0)
-                         attack_state      <= waiting_instr_5;
-                         attack_seq_enable <= 1;
-                    end else begin
+                    if (instr_in == instr_4) begin                // lbu a4,-31(s0)  // carga en a4 si el botón está oprimido
+                         attack_state      <= waiting_instr_5;                       //
+                         attack_seq_enable <= 1;                                     // la ejecución de esta operación  
+                    end else begin                                                   // confirma la secuencia
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
                     end
                 end
 
                 waiting_instr_5: begin
-                    if (instr_in == instr_5) begin                // li  a5,1
+                    if (instr_in == instr_5) begin                // li  a5,1        // carga en a5 el valor de referencia  
                          attack_state      <= waiting_instr_6;
                          attack_seq_enable <= 1;
                     end else begin
@@ -173,8 +173,8 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
                 end
 
                 waiting_instr_6: begin
-                    if (instr_in == instr_6) begin                // bne a4,a5,304 <main+0x210>
-                         attack_state      <= skipping_instr_7;
+                    if (instr_in == instr_6) begin                // bne a4,a5,304 <main+0x210>   // en este momento necesitamos que
+                         attack_state      <= skipping_instr_7;                                   // a4 y a5 sean iguales 
                          attack_seq_enable <= 1;
                     end else begin
                          attack_state      <= waiting_instr_0;
@@ -184,7 +184,7 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
 
                 skipping_instr_7: begin
                     attack_state      <= waiting_instr_0;
-                    attack_seq_enable <= 1;
+                    attack_seq_enable <= 0;
                 end
                 default: begin
                     attack_state      <= waiting_instr_0;
