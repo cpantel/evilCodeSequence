@@ -175,7 +175,7 @@ $ grep -A1 -n -e fef400a3 -e fe244703 -e 00800793 -e 02f71a63 -e fe144703 -e 001
                 waiting_instr_6: begin
                     if (instr_in == instr_6) begin                // bne a4,a5,304 <main+0x210>   // en este momento necesitamos que
                          attack_state      <= skipping_instr_7;                                   // a4 y a5 sean iguales 
-                         attack_seq_enable <= 1;
+                         attack_seq_enable <= 0;
                     end else begin
                          attack_state      <= waiting_instr_0;
                          attack_seq_enable <= 0;
