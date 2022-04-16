@@ -33,7 +33,20 @@ int main() {
     UART_BAUD = FREQ / BAUD_RATE; 
     LEDS = 0xAA;
 
-    char msg[] = "RTC: ..:.. \r\n\0";
+    char msg[13];
+    msg[0]='R';
+    msg[1]='T';
+    msg[2]='C';
+    msg[3]=':';
+    msg[4]=' ';
+    msg[5]='.';
+    msg[6]='.';
+    msg[7]=':';
+    msg[8]='.';
+    msg[9]='.';
+    msg[10]='\r';
+    msg[11]='\n';
+    msg[12]='\0';
 
     for (;;) {
         uint32_t rtc = RTC;
