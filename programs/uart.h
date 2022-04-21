@@ -3,6 +3,10 @@
 
 #define BAUD_RATE 9600
 
+static void uart_init() {
+    UART_BAUD = FREQ / BAUD_RATE;
+}
+
 static void uart_putc(char c) {
     while (!(UART_STATUS & UART_STATUS_TX_READY));
     UART_DATA = c;
