@@ -1,6 +1,27 @@
-# XXXX en icicle en EDU-FPGA
+# Ataque cambio de comportamiento en un programa al detectar una secuencia de código en icicle en EDU-FPGA
+
+Más detalles en:
+
+https://seguridad-agile.blogspot.com/2021/09/h4ck3d-2021-configuracion-basica.html
+
+https://seguridad-agile.blogspot.com/2021/09/h4ck3d-2021-leyendo-los-botones-de-la.html
+
+https://seguridad-agile.blogspot.com/2021/09/h4ck3d-2021-un-desvio-necesario.html
+
+https://seguridad-agile.blogspot.com/2021/09/h4ck3d-2021-un-desvio-innecesario.html
+
+https://seguridad-agile.blogspot.com/2021/10/h4ck3d-2021-sigue-el-desvio-para-bien.html
+
+https://seguridad-agile.blogspot.com/2021/10/h4ck3d-2021-cambios-al-makefile.html
+
+https://seguridad-agile.blogspot.com/2021/10/h4ck3d-2021-mejor-resolucion-de.html
+
+https://seguridad-agile.blogspot.com/2021/11/h4ck3d-2021-el-escenario-y-el-programa.html
+
+https://seguridad-agile.blogspot.com/2021/11/h4ck3d-2021-el-ataque-concreto.html
 
 
+## Falta revisión
 
 Instrucciones específicas para [EDU-FPGA](http://www.proyecto-ciaa.com.ar/devwiki/doku.php?id=desarrollo%3Aedu-fpga):
 
