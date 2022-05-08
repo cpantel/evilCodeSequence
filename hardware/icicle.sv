@@ -325,8 +325,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     servo #(.BASETIME(`FREQ)) servo (
         .clk(clk),
         .reset(reset),
-        .pwm(arduino[0]),
-        .monitor(arduino[23:16]),
+        //.pwm(arduino[0]),
+        //.monitor(arduino[23:16]),
         /* memory bus */
         .address_in(mem_address),
         .sel_in(servo_sel),
