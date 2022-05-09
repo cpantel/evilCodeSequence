@@ -130,7 +130,7 @@ Devices -> USB -> FTDI Dual RS232-HS[0700]
 ## Generación del bitstream
 
 
-- Clonar repositorio, construir y grabar memoria SPI de la EDU-FPGA:
+- Clonar repositorio, construir y grabar memoria de la EDU-FPGA:
 ```
 cd ~/workspace/
 git clone https://github.com/cpantel/evilCodeSequence.git
@@ -143,52 +143,25 @@ make flash
 
 Así se ve la salida típica de estos comandos:
 
-```
-$ make BOARD=edufpga
-riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=36000000 -Os -ffreestanding -nostartfiles -g -Iprograms/hello   -c -o programs/hello/main.o programs/hello/main.c
-riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=36000000 -Os -ffreestanding -nostartfiles -g -Iprograms/hello -Wl,-Tprogmem.lds -o progmem programs/hello/main.o start.o
-riscv64-unknown-elf-objcopy -O binary progmem progmem.bin
-xxd -p -c 4 < progmem.bin > progmem.hex
-yosys -q ice40.ys
-arachne-pnr -q -d 8k -P tq144:4k -o top_syn.asc -p boards/edufpga.pcf top.blif
-icebram progmem_syn.hex progmem.hex < top_syn.asc > top.asc
-icepack top.asc top.bin
-```
-```
-$ make BOARD=edufpga flash
-icetime -t -m -d hx8k -P tq144:4k -p boards/edufpga.pcf -c 36 -r top.rpt top_syn.asc
-// Reading input .pcf file..
-// Reading input .asc file..
-// Reading 8k chipdb file..
-// Creating timing netlist..
-// Timing estimate: 27.43 ns (36.45 MHz)
-// Checking 27.78 ns (36.00 MHz) clock constraint: PASSED.
-iceprog top.bin
-init..
-cdone: high
-reset..
-cdone: low
-flash ID: 0xEF 0x30 0x13 0x00
-file size: 135100
-erase 64kB sector at 0x000000..
-erase 64kB sector at 0x010000..
-erase 64kB sector at 0x020000..
-programming..
-reading..
-VERIFY OK
-cdone: high
-Bye.
-```
-
-¡Listo! Deberías ver destellar los LEDs de la EDU-FPGA y por la UART (`/dev/ttyUSB1`) deberías observar el mensaje `Hello, world!`.
-
-```
-$ cat /dev/ttyUSB1
-Hello, world!
-
-Hello, world!
-
-Hello, world!
-```
+![](./img/software.png)
+![](./img/hardware.png)
+![](./img/system.png)
+![](./img/flash.png)
 
 
+¡Listo! Si conectaras unos switches al PMOD1, unos leds al PMOD0, un servo y unos leds al conector Arduino, verías...
+
+Para compilar y desplegar otros programas:
+
+```
+make PROGRAM=rtc2uart
+```
+## TODO
+
+  - Terminar de hacer funcionar K.I.T.T. 
+  - Diseñar e implementar **sequencer**
+  - Agregar lo que verías al paso anterior
+  - Agregar diagrama e imagen con el conexionado para **fulldemo**
+  - Orquestar mejor los readme legacy
+  - Explicar como funciona
+  - Explicar la evolución 
