@@ -56,7 +56,7 @@ cd ~/workspace/
 git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
 cd riscv-gnu-toolchain
 
-./configure
+./configure --enable-multilib
 sudo make # compila e instala
 ```
 
@@ -133,11 +133,12 @@ Devices -> USB -> FTDI Dual RS232-HS[0700]
 - Clonar repositorio, construir y grabar memoria SPI de la EDU-FPGA:
 ```
 cd ~/workspace/
-git clone https://github.com/cpantel/XXX.git
-cd XXX
-make BOARD=edufpga
+git clone https://github.com/cpantel/evilCodeSequence.git
+cd evilCodeSequence
+# esto construirá el programa demofull
+make software hardware system
 # antes de ejecutar el siguiente comando, conectar la EDU-FPGA a la PC
-make BOARD=edufpga flash
+make flash
 ```
 
 Así se ve la salida típica de estos comandos:
