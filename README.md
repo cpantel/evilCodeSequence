@@ -156,4 +156,12 @@ Para compilar y desplegar otros programas:
 ```
 make PROGRAM=rtc2uart
 ```
+## TODO
 
+  - Terminar de hacer funcionar K.I.T.T. 
+  - Diseñar e implementar **sequencer**
+  - Agregar lo que verías al paso anterior
+  - Agregar diagrama e imagen con el conexionado para **fulldemo**
+  - Orquestar mejor los readme legacy
+  - Explicar como funciona
+  - Explicar la evolución 
