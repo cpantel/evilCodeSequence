@@ -163,5 +163,7 @@ make PROGRAM=rtc2uart
   - Agregar lo que verías al paso anterior
   - Agregar diagrama e imagen con el conexionado para **fulldemo**
   - Orquestar mejor los readme legacy
-  - Explicar como funciona
-  - Explicar la evolución 
+  - Agregar diagrama de toolchain
+  - Explicar como funciona 
+  - Explicar la evolución
+  - Señalar que el ataque está en su propio branch 
