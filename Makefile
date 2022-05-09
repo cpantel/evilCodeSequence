@@ -1,7 +1,7 @@
 .DEFAULT_GOAL = all
 
 BOARD    ?= edufpga
-PROGRAM  ?= hello
+PROGRAM  ?= fulldemo
 OPTLEVEL ?= -Os
 QUIET    = -q
 SEED     ?=
