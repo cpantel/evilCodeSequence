@@ -6,6 +6,7 @@
 #define RTC         *((volatile uint32_t *) 0x00010014)
 #define SERVO       *((volatile uint32_t *) 0x00010018)
 #define KITT        *((volatile uint32_t *) 0x00010020)
+#define SEQUENCER   *((volatile uint32_t *) 0x00011000)
 #define UART_BAUD   *((volatile uint32_t *) 0x00020000)
 #define UART_STATUS *((volatile uint32_t *) 0x00020004)
 #define UART_DATA   *((volatile  int32_t *) 0x00020008)

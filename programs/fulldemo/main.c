@@ -33,8 +33,14 @@ int main() {
 riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=36000000 -Os -ffreestanding -nostartfiles -g -Iprograms/rtc2uart -Wl,-TBUILD/progmem.lds -o BUILD/progmem programs/rtc2uart/main.o start.o
 /usr/local/lib/gcc/riscv64-unknown-elf/11.1.0/../../../../riscv64-unknown-elf/bin/ld: /usr/local/lib/gcc/riscv64-unknown-elf/11.1.0/../../../../riscv64-unknown-elf/lib/libc.a(lib_a-memcpy.o): ABI is incompatible with that of the selected emulation:
   target emulation `elf64-littleriscv' does not match `elf32-littleriscv'
-*/
 
+
+https://github.com/riscv-software-src/homebrew-riscv/issues/19
+
+
+la clave es multilib
+*/
+/*
     char rtcMsg[13];
     rtcMsg[0]='R';
     rtcMsg[1]='T';
@@ -49,6 +55,11 @@ riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=
     rtcMsg[10]=13;
     rtcMsg[11]=10;
     rtcMsg[12]='\0';
+*/
+//    char rtcMsg[13] = {'R', 'T', 'C', ':', ' ', '.', '.', ':', '.', '.', 13, 10,'\0'};
+
+    char rtcMsg[] = "RTC: ..:..\r\n";
+
     uint32_t rtc = RTC;
 
     // SERVO
@@ -62,8 +73,9 @@ riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=
     char buttons;
 
     // KITT
-    #define KITT_MAX_SPEED 16
-    int kitt_delay = 1;
+    #define KITT_MAX_SPEED FREQ * 4
+    #define KITT_MIN_SPEED FREQ / 4
+    int kitt_delay = FREQ;
 
     for (;;) {
         // RTC to UART
@@ -102,12 +114,12 @@ riscv64-unknown-elf-gcc -march=rv32i -mabi=ilp32 -Wall -Wextra -pedantic -DFREQ=
         if ((buttons & 8 ) >> 3 ) {
             kitt_delay = KITT_MAX_SPEED;
         } else if (buttons & 1 ) {
-            kitt_delay = 1;
+            kitt_delay = KITT_MIN_SPEED;
         } else if ((buttons & 2 ) >> 1 ) {
-            --kitt_delay;
-            if (kitt_delay < 1 ) kitt_delay = 1;
+            kitt_delay /= 2;
+            if (kitt_delay < KITT_MAX_SPEED ) kitt_delay = KITT_MAX_SPEED;
         } else if ((buttons & 4 ) >> 2 ) {
-            ++kitt_delay;
+            kitt_delay *= 2;
             if (kitt_delay > KITT_MAX_SPEED) kitt_delay = KITT_MAX_SPEED;
         }
         // SEQUENCER

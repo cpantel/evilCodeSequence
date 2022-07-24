@@ -26,7 +26,7 @@ module kitt #( parameter BASETIME) (
 
     always_ff @(posedge clk) begin
         if (reset) begin
-            prescaler <= 1;
+            prescaler <= 0;
 //            read_value_out <= 0;
         end else begin
 //            read_value_out <= sel_in ? 32'b0 : prescaler;  // to be verified
@@ -48,7 +48,7 @@ module kitt #( parameter BASETIME) (
             display <= 1;
             direction <= 1;
             q <= 0;
-        end else if ( q >  BASETIME ) begin
+        end else if ( q >  prescaler ) begin
             q <= 0;
             if (direction ) begin
                  if ( display[4] ) begin
@@ -64,7 +64,7 @@ module kitt #( parameter BASETIME) (
                      display <= display >> 1;
             end 
        end else begin
-            q <= q + prescaler;
+            q <= q + 1;
             display <= display;
        end
     end
