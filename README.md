@@ -1,4 +1,6 @@
-# Ataque cambio de comportamiento en un programa al detectar una secuencia de código en icicle en EDU-FPGA
+# Adaptación de icicle a EDU-CIAA-FPGA
+
+El ataque cambio de comportamiento en un programa al detectar una secuencia de código, al cuál debe el nombre este repositorio, está en https://github.com/cpantel/evilCodeSequence/tree/attack_detect_code_ok_undetectable
 
 Más detalles en:
 
@@ -29,13 +31,7 @@ Instrucciones específicas para [EDU-FPGA](http://www.proyecto-ciaa.com.ar/devwi
 
 Estos pasos fueron probados con `Linux Mint 21 Mate` en un sistema de 64-bits `x86_64`.
 
-### Prerrequisitos
-
-- Crear un directorio de trabajo y posicionarse en él.
-```
-mkdir -p ~/workspace/
-cd ~/workspace/
-```
+### Dependencias
 
 - Instalar dependencias disponibles en el repositorio.
 
@@ -45,9 +41,27 @@ sudo apt install gperf build-essential cmake python3-dev texinfo vim libboost-al
 
 ```
 
+- Crear un directorio de trabajo y posicionarse en él.
+```
+mkdir -p ~/workspace/
+cd ~/workspace/
+```
+
+#### Permisos
+
+Tal como está, hace falta root para instalar, de querer instalar como usuario común, ver para cada proyecto la opción de ruta de instalación.
+
+Para que `iceprog` pueda acceder a la placa, puede hacer falta:
+ 
+```
+echo 'ACTION=="add", ATTR{idVendor}=="0403", ATTR{idProduct}=="6010", MODE:="666"' |\
+sudo tee -a /etc/udev/rules.d/70-lattice.rules 1>/dev/null
+sudo service udev restart
+```
+
 ### Toolchain RISC-V
 
-Clonar y construir el toolchain para `RV32I`. La instalación necesita privilegios de root.
+Clonar y construir el toolchain para `RV32I`.
 
 **NOTA**: Este repositorio es grande (~7GB). Clonarlo y luego construirlo lleva tiempo, ¡paciencia!
 
@@ -57,12 +71,10 @@ git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
 cd riscv-gnu-toolchain
 
 ./configure --enable-multilib
-sudo make # compila e instala
+sudo make # compila e instala en una o dos horas en VM i5 dual core...
 ```
 
 ### Icarus Verilog
-
-La instalación necesita privilegios de root.
 
 ```
 cd ~/workspace/
@@ -76,8 +88,6 @@ sudo make install
 
 ### IceStorm
 
-La instalación necesita privilegios de root.
-
 ```
 cd ~/workspace/
 git clone https://github.com/YosysHQ/icestorm.git icestorm
@@ -87,8 +97,6 @@ sudo make install
 ```
 
 ### NextPNR
-
-La instalación necesita privilegios de root.
 
 ```
 cd ~/workspace/
@@ -101,8 +109,6 @@ sudo make install
 
 ### Yosys
 
-La instalación necesita privilegios de root.
-
 ```
 cd ~/workspace/
 git clone https://github.com/YosysHQ/yosys.git yosys
@@ -112,20 +118,8 @@ make -j$(nproc)
 sudo make install
 ```
 
-## Permisos
 
-Para que `iceprog` pueda acceder a la placa, puede hacer falta:
- 
-```
-echo 'ACTION=="add", ATTR{idVendor}=="0403", ATTR{idProduct}=="6010", MODE:="666"' |\
-sudo tee -a /etc/udev/rules.d/70-lattice.rules 1>/dev/null
-sudo service udev restart
-```
-## Conexión en Virtual Box
 
-No te olvides de conectar a la virtual:
-
-Devices -> USB -> FTDI Dual RS232-HS[0700]
 
 ## Generación del bitstream
 
@@ -156,6 +150,13 @@ Para compilar y desplegar otros programas:
 ```
 make PROGRAM=rtc2uart
 ```
+
+### Conexión en Virtual Box
+
+No te olvides de conectar a la virtual:
+
+Devices -> USB -> FTDI Dual RS232-HS[0700]
+
 ## TODO
 
   - Terminar de hacer funcionar K.I.T.T. 
