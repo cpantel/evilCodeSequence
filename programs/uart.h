@@ -19,3 +19,10 @@ static void uart_puts(const char *str) {
     }
 }
 
+static char uart_getc() {
+    if ( UART_STATUS & UART_STATUS_RX_READY) {
+        return UART_DATA;
+    }
+    return 0;
+}
+
