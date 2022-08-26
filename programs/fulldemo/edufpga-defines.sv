@@ -5,10 +5,10 @@
 `define RTC_DEV
 `define noSERVO_DEV
 `define UART_DEV
-`define KITT_DEV
+`define noKITT_DEV
 `define noSEQUENCER_DEV
 
-`define PMOD0_CONN
+`define noPMOD0_CONN
 `define noPMOD1_CONN
 `define noARDUINO_CONN
 
