@@ -2,15 +2,15 @@
   This program covers:
      UART read and write
      RTC
+     LEDS
+     BUTTONS
  
   This program will cover:
-     KITT 
-     SEQUENCER
+     KITT (via ARDUINO CONN)
+     SEQUENCER (via ARDUINO CONN)
      PMOD in
      PMOD out
      PWM (via ARDUINO CONN)
-     LEDS
-     BUTTONS
 */
 
 #include <stdint.h>
@@ -149,8 +149,57 @@ void menu_sequencer() {
 } 
 
 
+void menu_leds() {
+  char cmd = ' ';
+  while (cmd != '0') {
+    switch (cmd) {
+      case '1':
+        uart_puts(">>> LEDS toggle led 1\r\n");
+        LEDS = LEDS ^ 1;
+      break;
+      case '2':
+        uart_puts(">>> LEDS toggle led 2\r\n");
+        LEDS = LEDS ^ 2;
+      break;
+      case '3':
+        uart_puts(">>> LEDS toggle led 3\r\n");
+        LEDS = LEDS ^ 4;
+      break;
+      case '4':
+        uart_puts(">>> LEDS toggle led 4\r\n");
+        LEDS = LEDS ^ 8;
+      break;
+      case '5':
+        uart_puts(">>> LEDS toggle all\r\n");
+        LEDS = ~LEDS ;
+      break;
+      case '6':
+        uart_puts(">>> LEDS all on\r\n");
+        LEDS = 0xF;
+      break;
+      case '7':
+        uart_puts(">>> LEDS all off\r\n");
+        LEDS = 0;
+      break;
+      case '8':
+        uart_puts(">>> LEDS copied from BUTTONS\r\n");
+        LEDS = ~BUTTONS;
+      break;
+      case '\n':
+      case 0:
+      break;
+      default:
+        uart_puts("LEDS and BUTTONS Menu\r\n   (1) Toggle led1\r\n   (2) Toggle led2\r\n   (3) Toggle led3\r\n   (4) Toggle led4\r\n   (5) Toggle all\r\n   (6) All on\r\n   (7) All off\r\n   (8) Copy BUTTONS to LEDS\r\n   (0) Exit\r\n\0");
+      break;
+    }
+    cmd = uart_getc();
+  }
+ 
+}
+
+
 int main() {
-  char menu[]="Main Menu\r\n   (1) PWM\r\n   (2) Servo\r\n   (3) KITT\r\n   (4) Sequencer\r\n   (5) Print RTC\r\n\0";
+  char menu[]="Main Menu\r\n   (1) LEDS\r\n   (2) PWM\r\n   (3) Servo\r\n   (4) KITT\r\n   (5) Sequencer\r\n   (6) Print RTC\r\n\0";
 
   uart_init();
   cls();
@@ -160,18 +209,21 @@ int main() {
     char cmd = uart_getc();
     switch (cmd) {
       case '1':
-        menu_pwm();
+        menu_leds();
       break;
       case '2':
-        menu_servo();
+        menu_pwm();
       break;
       case '3':
-        menu_kitt();
+        menu_servo();
       break;
       case '4':
-        menu_sequencer();
+        menu_kitt();
       break;
       case '5':
+        menu_sequencer();
+      break;
+      case '6':
         printRTC();
         uart_puts(menu);
       break;
