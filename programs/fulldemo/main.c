@@ -206,13 +206,10 @@ int main() {
   delay();
   delay();
   delay();
-  delay();
-  delay();
-
 
   uart_init();
   cls();
-  uart_puts("Full Demo starting\r\n");
+  uart_puts("Full Demo starting (sparse lta)\r\n");
   uart_puts(menu);
   while (1) {
     char cmd = uart_getc();
