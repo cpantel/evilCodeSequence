@@ -4,6 +4,7 @@
      RTC
      LEDS
      BUTTONS
+     delay()
  
   This program will cover:
      KITT (via ARDUINO CONN)
@@ -17,6 +18,7 @@
 #include "../memmap.h"
 #include "../uart.h"
 #include "../delay.h"
+
 void cls() {
   for (int i=0; i< 25; ++i) {
     uart_puts("\r\n\0");
@@ -31,6 +33,21 @@ void printRTC() {
   msg[8] = ((rtc & 0xf0 ) >> 4 ) + '0';
   msg[9] = ( rtc & 0xf ) + '0';
   uart_puts(msg);
+}
+
+void displayRTC() {
+  uart_puts("\r\n");
+  char msg[] = "   RTC: ..:.. \r\0";
+  while (0 == uart_getc()) {
+    uint32_t rtc = RTC;
+    msg[8] = ((rtc & 0xf000 ) >> 12 ) + '0';
+    msg[9] = ((rtc & 0xf00 ) >> 8 ) + '0';
+    msg[11] = ((rtc & 0xf0 ) >> 4 ) + '0';
+    msg[12] = ( rtc & 0xf ) + '0';
+    uart_puts(msg);
+    delay();
+  }    
+  uart_puts("\r\n\r\n");
 }
 
 void menu_pwm() {
@@ -86,7 +103,6 @@ void menu_servo() {
     cmd = uart_getc();
   }
 } 
-
 
 void menu_kitt() {
   char cmd = ' ';
@@ -148,7 +164,6 @@ void menu_sequencer() {
   }
 } 
 
-
 void menu_leds() {
   char cmd = ' ';
   while (cmd != '0') {
@@ -194,19 +209,18 @@ void menu_leds() {
     }
     cmd = uart_getc();
   }
- 
 }
 
-
 int main() {
-  char menu[]="Main Menu\r\n   (1) LEDS\r\n   (2) PWM\r\n   (3) Servo\r\n   (4) KITT\r\n   (5) Sequencer\r\n   (6) Print RTC\r\n\0";
+  char menu[]="Main Menu\r\n   (1) LEDS\r\n   (2) PWM\r\n   (3) Servo\r\n   (4) KITT\r\n   (5) Sequencer\r\n   (6) Print RTC\r\n   (7) Display RTC\r\n\0";
 
   uart_init();
   cls();
   uart_puts("Full Demo starting\r\n");
-  uart_puts(menu);
+  char cmd = ' ';
   while (1) {
-    char cmd = uart_getc();
+    if (cmd != 0) uart_puts(menu);
+    cmd = uart_getc();
     switch (cmd) {
       case '1':
         menu_leds();
@@ -225,13 +239,11 @@ int main() {
       break;
       case '6':
         printRTC();
-        uart_puts(menu);
       break;
-      case '\n':
-      case 0:
+      case '7':
+	displayRTC();
       break;
       default:
-        uart_puts(menu);
       break;
     }
   }
@@ -256,21 +268,8 @@ int main() {
     int kitt_delay = FREQ;
 
     for (;;) {
-        // RTC to UART
-        rtc = RTC;
-        rtcMsg[5] = ((rtc & 0xf000 ) >> 12 ) + '0';
-        rtcMsg[6] = ((rtc & 0xf00 ) >> 8 ) + '0';
-        rtcMsg[8] = ((rtc & 0xf0 ) >> 4 ) + '0';
-        rtcMsg[9] = ( rtc & 0xf ) + '0';
-        uart_puts(rtcMsg);
-
-        // BUTTONS
-        buttons = ~BUTTONS;
-
-
         // PMOD0 to PMOD1  
         PMOD0 = PMOD1;
-
 
         // SERVO
         SERVO = servo_position;
@@ -307,7 +306,6 @@ int main() {
         // if position == SERVO_MAX_POS
         //    change pattern
 
-        delay();
     }
 */
 
