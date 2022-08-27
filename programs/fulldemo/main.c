@@ -201,6 +201,15 @@ void menu_leds() {
 int main() {
   char menu[]="Main Menu\r\n   (1) LEDS\r\n   (2) PWM\r\n   (3) Servo\r\n   (4) KITT\r\n   (5) Sequencer\r\n   (6) Print RTC\r\n\0";
 
+  delay();
+  delay();
+  delay();
+  delay();
+  delay();
+  delay();
+  delay();
+
+
   uart_init();
   cls();
   uart_puts("Full Demo starting\r\n");

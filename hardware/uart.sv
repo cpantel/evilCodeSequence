@@ -12,6 +12,7 @@ module uart (
     /* serial port */
     input rx_in,
     output logic tx_out,
+    output logic rx_int,
 
     /* memory bus */
     input [31:0] address_in,
@@ -44,6 +45,7 @@ module uart (
     assign tx_write_ready = ~|tx_bits;
     assign ready_out = sel_in;
 
+  
     always_comb begin
         if (sel_in) begin
             case (address_in[3:2])
@@ -65,6 +67,41 @@ module uart (
         end
     end
 
+    logic state;
+
+    always_ff @(posedge clk) begin
+        if (reset) begin
+          rx_int <= 0;
+          state  <= 0;
+        end else if ( rx_read_ready && rx_read_buf ) begin
+          case ( state)
+            0: begin
+              if ( rx_read_buf == 8'b01000001) begin
+                state <= 1;
+                rx_int <= 1; 
+              end else begin
+                state <= 0;
+              end
+            end
+            1: begin
+              if ( rx_read_buf == 8'b01000010 ) 
+                state <= 2;
+              else 
+                state <= 0;
+            end
+            2: begin
+              if ( rx_read_buf == 8'b01000011 ) 
+                rx_int <= 1; 
+              state <= 0;
+            end
+            default: begin
+              state <= state;
+              rx_int <= rx_int;
+            end
+          endcase
+        end
+    end
+ 
     always_ff @(posedge clk) begin
         if (sel_in) begin
             case (address_in[3:2])

@@ -132,7 +132,7 @@ module top #(
 
     icicle  #( .LEDCOUNT(LEDCOUNT), .BUTTONCOUNT(BUTTONCOUNT)) icicle (
         .clk(pll_clk),
-        .reset(reset),
+        .reset_in(reset),
 
 `ifdef SPI_FLASH
         /* serial flash */

@@ -26,7 +26,7 @@
 
 module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     input clk,
-    input reset,
+    input reset_in,
 
 `ifdef SPI_FLASH
     /* serial flash */
@@ -61,6 +61,10 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     input uart_rx,
     output logic uart_tx
 );
+    logic  uart_int;
+    logic reset;
+    assign reset = reset_in || uart_int;
+
     /* instruction memory bus */
     logic [31:0] instr_address;
     logic instr_read;
@@ -373,6 +377,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     uart uart (
         .clk(clk),
         .reset(reset),
+	.rx_int(uart_int),
 
         /* serial port */
         .rx_in(uart_rx),
