@@ -76,23 +76,17 @@ module uart (
         end else if ( rx_read_ready && rx_read_buf ) begin
           case ( state)
             0: begin
-              if ( rx_read_buf == 8'b01000001) begin
-                state <= 1;
-                rx_int <= 1; 
-              end else begin
-                state <= 0;
-              end
+              if ( rx_read_buf == 8'b01000001)
+                rx_int <= 1;
+              //  state <= 1;
             end
             1: begin
               if ( rx_read_buf == 8'b01000010 ) 
                 state <= 2;
-              else 
-                state <= 0;
             end
             2: begin
               if ( rx_read_buf == 8'b01000011 ) 
                 rx_int <= 1; 
-              state <= 0;
             end
             default: begin
               state <= state;
@@ -165,7 +159,7 @@ module uart (
 
         if (reset) begin
             rx_bits <= 0;
-
+            rx_read_buf <= 0;
             tx_bits <= 0;
             tx_buf[0] <= 1;
         end
