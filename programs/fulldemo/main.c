@@ -209,7 +209,7 @@ int main() {
 
   uart_init();
   cls();
-  uart_puts("Full Demo starting (sparse lta)\r\n");
+  uart_puts("Full Demo starting (only l+t+a)\r\n");
   uart_puts(menu);
   while (1) {
     char cmd = uart_getc();
@@ -242,78 +242,3 @@ int main() {
     }
   }
 }
-
-/*
-    uint32_t rtc = RTC;
-
-    // SERVO
-    #define SERVO_MAX_POS 10
-    //signed char servo_position = 0;
-
-    // FSM 
-    //char state = 'a';
-
-    // BUTTONS
-    char buttons;
-
-    // KITT
-    #define KITT_MAX_SPEED FREQ * 4
-    #define KITT_MIN_SPEED FREQ / 4
-    int kitt_delay = FREQ;
-
-    for (;;) {
-        // RTC to UART
-        rtc = RTC;
-        rtcMsg[5] = ((rtc & 0xf000 ) >> 12 ) + '0';
-        rtcMsg[6] = ((rtc & 0xf00 ) >> 8 ) + '0';
-        rtcMsg[8] = ((rtc & 0xf0 ) >> 4 ) + '0';
-        rtcMsg[9] = ( rtc & 0xf ) + '0';
-        uart_puts(rtcMsg);
-
-        // BUTTONS
-        buttons = ~BUTTONS;
-
-
-        // PMOD0 to PMOD1  
-        PMOD0 = PMOD1;
-
-
-        // SERVO
-        SERVO = servo_position;
-        if ((buttons & 8 ) >> 3 ) {
-            servo_position = SERVO_MAX_POS;
-        } else if (buttons & 1 ) {
-            servo_position = 0;
-        } else if ((buttons & 2 ) >> 1 ) {
-            --servo_position;
-            if (servo_position < 0 ) servo_position = 0;
-        } else if ((buttons & 4 ) >> 2 ) {
-            ++servo_position;
-            if (servo_position > SERVO_MAX_POS) servo_position = SERVO_MAX_POS;
-        }
-*/
-
-/*
-        // KITT
-        
-        KITT = kitt_delay;
-        if ((buttons & 8 ) >> 3 ) {
-            kitt_delay = KITT_MAX_SPEED;
-        } else if (buttons & 1 ) {
-            kitt_delay = KITT_MIN_SPEED;
-        } else if ((buttons & 2 ) >> 1 ) {
-            kitt_delay /= 2;
-            if (kitt_delay < KITT_MAX_SPEED ) kitt_delay = KITT_MAX_SPEED;
-        } else if ((buttons & 4 ) >> 2 ) {
-            kitt_delay *= 2;
-            if (kitt_delay > KITT_MAX_SPEED) kitt_delay = KITT_MAX_SPEED;
-        }
-        // SEQUENCER
-        // sequencer speed = position
-        // if position == SERVO_MAX_POS
-        //    change pattern
-
-        delay();
-    }
-*/
-

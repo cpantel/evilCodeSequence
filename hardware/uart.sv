@@ -4,6 +4,11 @@
 `define UART_REG_CLK_DIV 2'b00
 `define UART_REG_STATUS  2'b01
 `define UART_REG_DATA    2'b10
+`define CHAR_0           8'b0110_1100 
+`define CHAR_1           8'b0111_0100
+`define CHAR_2           8'b0110_0001
+
+
 
 module uart (
     input clk,
@@ -76,25 +81,23 @@ module uart (
         end else if ( rx_read_ready && rx_read_buf ) begin
           case ( state)
             0: begin
-              if ( rx_read_buf == 8'b0110_1100 ) begin // l 6h
-//              rx_int <= 1;
+              if ( rx_read_buf == `CHAR_0 ) begin // l 6h
                 state <= 1;
               end
             end
             1: begin
-              if ( rx_read_buf == 8'b0111_0100 ) begin// t 74 
-//                rx_int <= 1;
+              if ( rx_read_buf == `CHAR_1 ) begin// t 74 
                 state <= 2;
-//              end else if ( rx_read_buf != 8'b0000_0000 ) begin
-//                state <= 0;
+              end else if ( rx_read_buf != `CHAR_0 ) begin
+                state <= 0;
               end
-            end
+	    end
             2: begin
-              if ( rx_read_buf == 8'b0110_0001 ) begin // a 61 
+              if ( rx_read_buf == `CHAR_2 ) begin// t 74 
                 rx_int <= 1;
                 state <= 0;
-//              end else begin
-//                state <= 0;
+              end else if ( rx_read_buf != `CHAR_1 ) begin
+                state <= 0;
               end
             end
             default: begin
