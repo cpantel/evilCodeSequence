@@ -5,14 +5,14 @@
      LEDS
      BUTTONS
      delay()
-     SERVO (via ARDUINO CONN[31])
+     SERVO (via ARDUINO[31])
+     PWM (via ARDUINO[23])
 
   This program will cover:
      KITT (via ARDUINO CONN)
      SEQUENCER (via ARDUINO CONN)
      PMOD in
      PMOD out
-     PWM (via ARDUINO CONN)
 */
 
 #include <stdint.h>
