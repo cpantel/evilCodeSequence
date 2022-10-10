@@ -379,7 +379,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     kitt #(.BASETIME(`FREQ)) kitt (
         .clk(clk),
         .reset(reset),
-        .display_out(pmod0[4:0]),
+        .display_out(arduino[20:16]),
         /* memory bus */
         .address_in(mem_address),
         .sel_in(kitt_sel),

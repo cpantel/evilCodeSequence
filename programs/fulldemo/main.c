@@ -7,9 +7,9 @@
      delay()
      SERVO (via ARDUINO[31])
      PWM (via ARDUINO[23])
+     KITT (via ARDUINO[20:16)
 
   This program will cover:
-     KITT (via ARDUINO CONN)
      SEQUENCER (via ARDUINO CONN)
      PMOD in
      PMOD out
@@ -122,21 +122,36 @@ void menu_servo() {
   }
 } 
 
+#define KITT_MAX_SPEED  FREQ/8
+#define KITT_MIN_SPEED  FREQ/2
+#define KITT_DELTA      FREQ/20
+unsigned int kitt_speed = (KITT_MAX_SPEED + KITT_MIN_SPEED) / 2;
+
+
 void menu_kitt() {
   char cmd = ' ';
   while (cmd != '0') {
     switch (cmd) {
       case '1':
         uart_puts(">>> KITT fastest\r\n");
+	kitt_speed = KITT_MAX_SPEED;
       break;
       case '2':
-        uart_puts(">>> KITT fast\r\n");
+        if (kitt_speed > KITT_MAX_SPEED) {
+          uart_puts(">>> KITT faster\r\n");
+          kitt_speed -= KITT_DELTA;
+        }
+
       break;
       case '3':
-        uart_puts(">>> KITT slower\r\n");
+        if (kitt_speed < KITT_MIN_SPEED) {
+          kitt_speed += KITT_DELTA;
+          uart_puts(">>> KITT slower\r\n");
+        }
       break;
       case '4':
         uart_puts(">>> KITT slowest\r\n");
+	kitt_speed = KITT_MIN_SPEED;
       break;
       case '\n':
       case 0:
@@ -145,6 +160,7 @@ void menu_kitt() {
         uart_puts("KITT Menu\r\n   (1) Fastest\r\n   (2) Faster\r\n   (3) Slower\r\n   (4) Slowest\r\n   (0) Exit\r\n\0");
       break;
     }
+    KITT = kitt_speed;
     cmd = uart_getc();
   }
 } 

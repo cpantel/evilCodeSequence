@@ -32,13 +32,13 @@ module kitt #( parameter BASETIME) (
 //            read_value_out <= sel_in ? 32'b0 : prescaler;  // to be verified
             if (sel_in ) begin                                // to be verified
                 if (write_mask_in[3])
-                    prescaler[7:0] <= write_value_in[31:24];
+                    prescaler[31:24] <= write_value_in[31:24];
                 if (write_mask_in[2])
-                    prescaler[15:8] <= write_value_in[23:16];
+                    prescaler[23:16] <= write_value_in[23:16];
                 if (write_mask_in[1])
-                    prescaler[23:16] <= write_value_in[15:8];
+                    prescaler[15:8] <= write_value_in[15:8];
                 if (write_mask_in[0])
-                    prescaler[31:24] <= write_value_in[7:0];
+                    prescaler[7:0] <= write_value_in[7:0];
             end
         end
     end

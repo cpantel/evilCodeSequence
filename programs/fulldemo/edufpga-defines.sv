@@ -7,7 +7,7 @@
 `define UART_DEV
 `define PWM_DEV
 
-`define noKITT_DEV
+`define KITT_DEV
 `define noSEQUENCER_DEV
 
 `define noPMOD0_CONN
