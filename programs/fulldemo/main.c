@@ -63,14 +63,30 @@ void menu_pwm() {
 	pwm = PWM_MAX;
       break;
       case '2':
-        uart_puts(">>> Pwm higher\r\n");
-	if (pwm < PWM_MAX) ++pwm;
+	if (pwm < PWM_MAX) {
+          ++pwm;
+          uart_puts(">>> Pwm higher\r\n");
+        }
       break;
       case '3':
-        uart_puts(">>> Pwm lower\r\n");
-	if (pwm > 0) --pwm;
+        uart_puts(">>> Pwm 3/4\r\n");
+	pwm = PWM_MAX / 4 * 3;
       break;
       case '4':
+        uart_puts(">>> Pwm 1/2\r\n");
+	pwm = PWM_MAX / 2;
+      break;
+      case '5':
+        uart_puts(">>> Pwm 1/4\r\n");
+	pwm = PWM_MAX / 4;
+      break;
+      case '6':
+	if (pwm > 0) {
+          --pwm;
+          uart_puts(">>> Pwm lower\r\n");
+        }
+      break;
+      case '7':
         uart_puts(">>> Pwm lowest\r\n");
 	pwm = 0;
       break;
@@ -78,7 +94,7 @@ void menu_pwm() {
       case 0:
       break;
       default:
-        uart_puts("PWM Menu\r\n   (1) Highest\r\n   (2) Higher\r\n   (3) Lower\r\n   (4) Lowest\r\n   (0) Exit\r\n\0");
+        uart_puts("PWM Menu\r\n   (1) Highest\r\n   (2) Higher\r\n   (3) 3/4\r\b   (4) 1/2\r\n   (5) 1/4\r\n   (6) Lower\r\n   (7) Lowest\r\n   (0) Exit\r\n\0");
       break;
     }
     PWM = pwm;
@@ -99,12 +115,16 @@ void menu_servo() {
 	servo_position = 0;
       break;
       case '2':
-        uart_puts(">>> Servo move left\r\n");
-	if (servo_position > 0) --servo_position;
+	if (servo_position > 0) {
+          --servo_position;
+          uart_puts(">>> Servo move left\r\n");
+        }
       break;
       case '3':
-        uart_puts(">>> Servo move right\r\n");
-	if (servo_position < SERVO_MAX_POS) ++servo_position;
+	if (servo_position < SERVO_MAX_POS) {
+          ++servo_position;
+          uart_puts(">>> Servo move right\r\n");
+        }
       break;
       case '4':
         uart_puts(">>> Servo full right\r\n");
@@ -191,7 +211,7 @@ void menu_sequencer() {
       case 0:
       break;
       default:
-        uart_puts("Sequencer Menu\r\n   (1) Start\r\n   (2) Faster\r\n   (3) Slower\r\n   (4) Stop\r\n   (5) Clear\r\n   (6) Read next step\r\n   (0) Exit\r\n\0");
+        uart_puts("Sequencer Menu (unimplemented)\r\n   (1) Start\r\n   (2) Faster\r\n   (3) Slower\r\n   (4) Stop\r\n   (5) Clear\r\n   (6) Read next step\r\n   (0) Exit\r\n\0");
       break;
     }
     cmd = uart_getc();
