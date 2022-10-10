@@ -5,7 +5,8 @@
      LEDS
      BUTTONS
      delay()
- 
+     SERVO (via ARDUINO CONN[31])
+
   This program will cover:
      KITT (via ARDUINO CONN)
      SEQUENCER (via ARDUINO CONN)
@@ -77,21 +78,29 @@ void menu_pwm() {
   }
 }
 
+
+#define SERVO_MAX_POS 10
+signed char servo_position = 0;
+
 void menu_servo() {
   char cmd = ' ';
   while (cmd != '0') {
     switch (cmd) {
       case '1':
         uart_puts(">>> Servo full left\r\n");
+	servo_position = 0;
       break;
       case '2':
         uart_puts(">>> Servo move left\r\n");
+	if (servo_position > 0) --servo_position;
       break;
       case '3':
         uart_puts(">>> Servo move right\r\n");
+	if (servo_position < SERVO_MAX_POS) ++servo_position;
       break;
       case '4':
         uart_puts(">>> Servo full right\r\n");
+	servo_position = SERVO_MAX_POS;
       break;
       case '\n':
       case 0:
@@ -100,6 +109,7 @@ void menu_servo() {
         uart_puts("Servo Menu\r\n   (1) Full left\r\n   (2) Go left\r\n   (3) Go right\r\n   (4) Full right\r\n   (0) Exit\r\n\0");
       break;
     }
+    SERVO = servo_position;
     cmd = uart_getc();
   }
 } 

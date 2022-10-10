@@ -3,7 +3,7 @@
 `define noPMOD1_DEV
 `define noARDUINO_DEV
 `define RTC_DEV
-`define noSERVO_DEV
+`define SERVO_DEV
 `define UART_DEV
 `define noKITT_DEV
 `define noSEQUENCER_DEV

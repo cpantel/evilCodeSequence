@@ -325,7 +325,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     servo #(.BASETIME(`FREQ)) servo (
         .clk(clk),
         .reset(reset),
-        //.pwm(arduino[0]),
+        .pwm(arduino[31]),
         //.monitor(arduino[23:16]),
         /* memory bus */
         .address_in(mem_address),
@@ -338,7 +338,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     );
 `else
 //    assign servo_read_value = 0;
-    assign servo_ready = rtc_sel;  // TODO: this is a bug, should servo_sel instead
+    assign servo_ready = servo_sel;
 `endif
 
     /* KITT */
@@ -389,7 +389,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     );
 `else
     assign uart_read_value = 0;
-    assign uart_ready = rtc_sel;   // TODO: this is a bug, should uart_sel instead
+    assign uart_ready = uart_sel;
 `endif
 
     /* TIMER */
