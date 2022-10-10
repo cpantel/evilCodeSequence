@@ -7,6 +7,7 @@
 `include "rtc.sv"
 `include "kitt.sv"
 `include "servo.sv"
+`include "pwm.sv"
 
 
 `ifdef ECP5
@@ -88,8 +89,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic mem_ready;
     logic mem_fault;
 
-    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | /*servo_read_value | kitt_read_value | */ uart_read_value | timer_read_value | flash_read_value;
-    assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | servo_ready | kitt_ready | uart_ready | timer_ready | flash_ready | mem_fault;
+    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | /*servo_read_value | kitt_read_value | pwm_read_value */ uart_read_value | timer_read_value | flash_read_value;
+    assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | servo_ready | kitt_ready | pwm_ready | uart_ready | timer_ready | flash_ready | mem_fault;
 
     bus_arbiter bus_arbiter (
         .clk(clk),
@@ -161,6 +162,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic rtc_sel;
     logic servo_sel;
     logic kitt_sel;
+    logic pwm_sel;
     logic uart_sel;
     logic timer_sel;
     logic flash_sel;
@@ -175,6 +177,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         rtc_sel = 0;
         servo_sel = 0;
         kitt_sel = 0;
+	pwm_sel = 0;
         uart_sel = 0;
         timer_sel = 0;
         flash_sel = 0;
@@ -190,6 +193,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
             32'b00000000_00000001_00000000_000100??: arduino_sel = 1; // ARDUINO 0x00010010
             32'b00000000_00000001_00000000_000101??: rtc_sel     = 1; // RTC     0x00010014
             32'b00000000_00000001_00000000_000110??: servo_sel   = 1; // SERVO   0x00010018
+            32'b00000000_00000001_00000000_000111??: pwm_sel     = 1; // PWM     0x0001001c
             32'b00000000_00000001_00000000_001000??: kitt_sel    = 1; // KITT    0x00010020
             32'b00000000_00000010_00000000_0000????: uart_sel    = 1; // UART    0x00020000
             32'b00000000_00000011_00000000_0000????: timer_sel   = 1; // TIMER   0x00030000
@@ -340,6 +344,32 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
 //    assign servo_read_value = 0;
     assign servo_ready = servo_sel;
 `endif
+
+    /* PWM */
+
+//    logic [31:0] pwm_read_value;
+    logic pwm_ready;
+`ifdef PWM_DEV
+    pwm #(.BASETIME(`FREQ)) pwm (
+        .clk(clk),
+        .reset(reset),
+        .pwm(arduino[23]),
+        //.monitor(arduino[23:16]),
+        /* memory bus */
+        .address_in(mem_address),
+        .sel_in(pwm_sel),
+        //.read_in(mem_read),
+       // .read_value_out(pwm_read_value),
+        .write_mask_in(mem_write_mask),
+        .write_value_in(mem_write_value),
+        .ready_out(pwm_ready)
+    );
+`else
+//    assign pwm_read_value = 0;
+    assign pwm_ready = pwm_sel;
+`endif
+
+
 
     /* KITT */
 

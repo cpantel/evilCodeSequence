@@ -51,21 +51,28 @@ void displayRTC() {
   uart_puts("\r\n\r\n");
 }
 
+#define PWM_MAX 255 
+unsigned char pwm = 0;
+
 void menu_pwm() {
   char cmd = ' ';
   while (cmd != '0') {
     switch (cmd) {
       case '1':
         uart_puts(">>> Pwm highest\r\n");
+	pwm = PWM_MAX;
       break;
       case '2':
         uart_puts(">>> Pwm higher\r\n");
+	if (pwm < PWM_MAX) ++pwm;
       break;
       case '3':
         uart_puts(">>> Pwm lower\r\n");
+	if (pwm > 0) --pwm;
       break;
       case '4':
         uart_puts(">>> Pwm lowest\r\n");
+	pwm = 0;
       break;
       case '\n':
       case 0:
@@ -74,6 +81,7 @@ void menu_pwm() {
         uart_puts("PWM Menu\r\n   (1) Highest\r\n   (2) Higher\r\n   (3) Lower\r\n   (4) Lowest\r\n   (0) Exit\r\n\0");
       break;
     }
+    PWM = pwm;
     cmd = uart_getc();
   }
 }

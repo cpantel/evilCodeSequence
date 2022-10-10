@@ -5,6 +5,7 @@
 #define ARDUINO     *((volatile uint32_t *) 0x00010010)
 #define RTC         *((volatile uint32_t *) 0x00010014)
 #define SERVO       *((volatile uint32_t *) 0x00010018)
+#define PWM         *((volatile uint64_t *) 0x0001001c)
 #define KITT        *((volatile uint32_t *) 0x00010020)
 #define SEQUENCER   *((volatile uint32_t *) 0x00011000)
 #define UART_BAUD   *((volatile uint32_t *) 0x00020000)
