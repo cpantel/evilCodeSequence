@@ -7,7 +7,7 @@
 #define SERVO        *((volatile uint32_t *) 0x00010018)
 #define PWM          *((volatile uint64_t *) 0x0001001c)
 #define KITT         *((volatile uint32_t *) 0x00010020)
-#define SEQUENCER(x) *((volatile uint32_t *) 0x00010180+x)
+#define SEQUENCER     ((volatile uint32_t *) 0x00010180)
 #define UART_BAUD    *((volatile uint32_t *) 0x00020000)
 #define UART_STATUS  *((volatile uint32_t *) 0x00020004)
 #define UART_DATA    *((volatile  int32_t *) 0x00020008)

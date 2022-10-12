@@ -201,25 +201,25 @@ void menu_sequencer() {
   while (cmd != '0') {
     switch (cmd) {
       case '1':
-        SEQUENCER(SEQUENCER_START_STOP_PORT ) = 0x11111111;
+        SEQUENCER[SEQUENCER_START_STOP_PORT] = 0x11111111;
         uart_puts(">>> SEQUENCER start\r\n");
       break;
       case '2':
-        SEQUENCER(SEQUENCER_START_STOP_PORT ) = 0x00000000;
+        SEQUENCER[SEQUENCER_START_STOP_PORT ] = 0x00000000;
         uart_puts(">>> SEQUENCER stop\r\n");
       break;
       case '3':
         uart_puts(">>> SEQUENCER high speed\r\n");
-        SEQUENCER(SEQUENCER_SPEED_PORT) = SEQUENCER_MAX_SPEED;
+        SEQUENCER[SEQUENCER_SPEED_PORT] = SEQUENCER_MAX_SPEED;
       break;
       case '4':
         uart_puts(">>> SEQUENCER low speed\r\n");
-        SEQUENCER(SEQUENCER_SPEED_PORT) = SEQUENCER_MIN_SPEED;
+        SEQUENCER[SEQUENCER_SPEED_PORT] = SEQUENCER_MIN_SPEED;
       break;
       case '5':
         uart_puts(">>> SEQUENCER insert incrementing sequence size (unimplemented clear)\r\n");
         uint32_t pattern = sequencer_size ;
-        SEQUENCER( sequencer_size) = pattern;
+        SEQUENCER[sequencer_size] = pattern;
        	++sequencer_size;
       break;
       case '6':
