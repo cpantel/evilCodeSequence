@@ -10,7 +10,7 @@
      KITT (via ARDUINO[20:16)
 
   This program will cover:
-     SEQUENCER (via ARDUINO CONN)
+     SEQUENCER (via ARDUINO[7:0])
      PMOD in
      PMOD out
 */
@@ -20,7 +20,7 @@
 #include "../uart.h"
 #include "../delay.h"
 
-void cls() {
+void uart_cls() {
   for (int i=0; i< 25; ++i) {
     uart_puts("\r\n\0");
   }
@@ -111,30 +111,30 @@ void menu_servo() {
   while (cmd != '0') {
     switch (cmd) {
       case '1':
-        uart_puts(">>> Servo full left\r\n");
+        uart_puts(">>> SERVO full left\r\n");
 	servo_position = 0;
       break;
       case '2':
 	if (servo_position > 0) {
           --servo_position;
-          uart_puts(">>> Servo move left\r\n");
+          uart_puts(">>> SERVO move left\r\n");
         }
       break;
       case '3':
 	if (servo_position < SERVO_MAX_POS) {
           ++servo_position;
-          uart_puts(">>> Servo move right\r\n");
+          uart_puts(">>> SERVO move right\r\n");
         }
       break;
       case '4':
-        uart_puts(">>> Servo full right\r\n");
+        uart_puts(">>> SERVO full right\r\n");
 	servo_position = SERVO_MAX_POS;
       break;
       case '\n':
       case 0:
       break;
       default:
-        uart_puts("Servo Menu\r\n   (1) Full left\r\n   (2) Go left\r\n   (3) Go right\r\n   (4) Full right\r\n   (0) Exit\r\n\0");
+        uart_puts("SERVO Menu\r\n   (1) Full left\r\n   (2) Go left\r\n   (3) Go right\r\n   (4) Full right\r\n   (0) Exit\r\n\0");
       break;
     }
     SERVO = servo_position;
@@ -184,34 +184,68 @@ void menu_kitt() {
     cmd = uart_getc();
   }
 } 
- 
+
+#define SEQUENCER_MAX_SPEED  FREQ/4
+#define SEQUENCER_MIN_SPEED  FREQ
+#define SEQUENCER_MAX_SIZE   32
+unsigned int sequencer_speed = SEQUENCER_MIN_SPEED;
+unsigned char sequencer_mem[SEQUENCER_MAX_SIZE] = {0x1, 0x3, 0x7, 0xf, 0x1f, 0x3f, 0x7f,0xff,0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
+uint32_t sequencer_size = 0; //SEQUENCER_MAX_SIZE;
+
+#define SEQUENCER_START_STOP_PORT 31
+#define SEQUENCER_SPEED_PORT      30
+
+
 void menu_sequencer() {
   char cmd = ' ';
   while (cmd != '0') {
     switch (cmd) {
       case '1':
-        uart_puts(">>> Sequencer start\r\n");
+        SEQUENCER(SEQUENCER_START_STOP_PORT ) = 0x11111111;
+        uart_puts(">>> SEQUENCER start\r\n");
       break;
       case '2':
-        uart_puts(">>> Sequencer stop\r\n");
+        SEQUENCER(SEQUENCER_START_STOP_PORT ) = 0x00000000;
+        uart_puts(">>> SEQUENCER stop\r\n");
       break;
       case '3':
-        uart_puts(">>> Sequencer faster\r\n");
+        uart_puts(">>> SEQUENCER high speed\r\n");
+        SEQUENCER(SEQUENCER_SPEED_PORT) = SEQUENCER_MAX_SPEED;
       break;
       case '4':
-        uart_puts(">>> Sequencer lower\r\n");
+        uart_puts(">>> SEQUENCER low speed\r\n");
+        SEQUENCER(SEQUENCER_SPEED_PORT) = SEQUENCER_MIN_SPEED;
       break;
       case '5':
-        uart_puts(">>> Sequencer clear\r\n");
+        uart_puts(">>> SEQUENCER insert incrementing sequence size (unimplemented clear)\r\n");
+        uint32_t pattern = sequencer_size ;
+        SEQUENCER( sequencer_size) = pattern;
+       	++sequencer_size;
       break;
-       case '6':
-        uart_puts(">>> Sequencer read next step\r\n");
+      case '6':
+        if (sequencer_size < SEQUENCER_MAX_SIZE) { 
+          uart_puts(">>> SEQUENCER read next step\r\n");
+	  ++sequencer_size;
+//          SEQUENCER[sequencer_size] = 0x3;
+//          SEQUENCER(sequencer_size) = 0x3;
+
+//          *((volatile uint32_t *) SEQUENCER  + sequencer_size * 4  ) = 0x3;
+        }
+      break;
+      case '7':
+        for (sequencer_size = 1; sequencer_size <= SEQUENCER_MAX_SIZE; ++sequencer_size) {
+//            SEQUENCER(sequencer_size) = sequencer_mem[sequencer_size - 1];
+//            SEQUENCER[sequencer_size] = sequencer_mem[sequencer_size - 1];
+		
+//          *((volatile uint32_t *) SEQUENCER  + idx * 4  ) = sequencer_mem[idx -1];
+        }
+//        *((volatile uint32_t *) SEQUENCER  ) = sequencer_size - 4;
       break;
       case '\n':
       case 0:
       break;
       default:
-        uart_puts("Sequencer Menu (unimplemented)\r\n   (1) Start\r\n   (2) Faster\r\n   (3) Slower\r\n   (4) Stop\r\n   (5) Clear\r\n   (6) Read next step\r\n   (0) Exit\r\n\0");
+        uart_puts("SEQUENCER Menu\r\n   (1) Start\r\n   (2) Stop\r\n   (3) High speed\r\n   (4) Low speed\r\n   (5) Clear\r\n   (6) Read next step\r\n   (7) Preload\r\n   (0) Exit\r\n\0");
       break;
     }
     cmd = uart_getc();
@@ -266,10 +300,10 @@ void menu_leds() {
 }
 
 int main() {
-  char menu[]="Main Menu\r\n   (1) LEDS\r\n   (2) PWM\r\n   (3) Servo\r\n   (4) KITT\r\n   (5) Sequencer\r\n   (6) Print RTC\r\n   (7) Display RTC\r\n\0";
+  char menu[]="Main Menu\r\n   (1) LEDS\r\n   (2) PWM\r\n   (3) SERVO\r\n   (4) KITT\r\n   (5) SEQUENCER\r\n   (6) Print RTC\r\n   (7) Display RTC\r\n\0";
 
   uart_init();
-  cls();
+  uart_cls();
   uart_puts("Full Demo starting\r\n");
   char cmd = ' ';
   while (1) {
@@ -302,64 +336,3 @@ int main() {
     }
   }
 }
-
-/*
-    uint32_t rtc = RTC;
-
-    // SERVO
-    #define SERVO_MAX_POS 10
-    //signed char servo_position = 0;
-
-    // FSM 
-    //char state = 'a';
-
-    // BUTTONS
-    char buttons;
-
-    // KITT
-    #define KITT_MAX_SPEED FREQ * 4
-    #define KITT_MIN_SPEED FREQ / 4
-    int kitt_delay = FREQ;
-
-    for (;;) {
-        // PMOD0 to PMOD1  
-        PMOD0 = PMOD1;
-
-        // SERVO
-        SERVO = servo_position;
-        if ((buttons & 8 ) >> 3 ) {
-            servo_position = SERVO_MAX_POS;
-        } else if (buttons & 1 ) {
-            servo_position = 0;
-        } else if ((buttons & 2 ) >> 1 ) {
-            --servo_position;
-            if (servo_position < 0 ) servo_position = 0;
-        } else if ((buttons & 4 ) >> 2 ) {
-            ++servo_position;
-            if (servo_position > SERVO_MAX_POS) servo_position = SERVO_MAX_POS;
-        }
-*/
-
-/*
-        // KITT
-        
-        KITT = kitt_delay;
-        if ((buttons & 8 ) >> 3 ) {
-            kitt_delay = KITT_MAX_SPEED;
-        } else if (buttons & 1 ) {
-            kitt_delay = KITT_MIN_SPEED;
-        } else if ((buttons & 2 ) >> 1 ) {
-            kitt_delay /= 2;
-            if (kitt_delay < KITT_MAX_SPEED ) kitt_delay = KITT_MAX_SPEED;
-        } else if ((buttons & 4 ) >> 2 ) {
-            kitt_delay *= 2;
-            if (kitt_delay > KITT_MAX_SPEED) kitt_delay = KITT_MAX_SPEED;
-        }
-        // SEQUENCER
-        // sequencer speed = position
-        // if position == SERVO_MAX_POS
-        //    change pattern
-
-    }
-*/
-

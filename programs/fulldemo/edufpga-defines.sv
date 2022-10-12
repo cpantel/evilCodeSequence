@@ -8,7 +8,7 @@
 `define PWM_DEV
 
 `define KITT_DEV
-`define noSEQUENCER_DEV
+`define SEQUENCER_DEV
 
 `define noPMOD0_CONN
 `define noPMOD1_CONN

@@ -8,6 +8,7 @@
 `include "kitt.sv"
 `include "servo.sv"
 `include "pwm.sv"
+`include "sequencer.sv"
 
 
 `ifdef ECP5
@@ -89,8 +90,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic mem_ready;
     logic mem_fault;
 
-    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | /*servo_read_value | kitt_read_value | pwm_read_value */ uart_read_value | timer_read_value | flash_read_value;
-    assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | servo_ready | kitt_ready | pwm_ready | uart_ready | timer_ready | flash_ready | mem_fault;
+    assign mem_read_value = ram_read_value | leds_read_value | buttons_read_value | pmod0_read_value | pmod1_read_value | arduino_read_value | rtc_read_value | /*servo_read_value | kitt_read_value | pwm_read_value | sequencer_read_value*/ uart_read_value | timer_read_value | flash_read_value;
+    assign mem_ready = ram_ready | leds_ready | buttons_ready | pmod0_ready | pmod1_ready | arduino_ready | rtc_ready | servo_ready | kitt_ready | pwm_ready | sequencer_ready | uart_ready | timer_ready | flash_ready | mem_fault;
 
     bus_arbiter bus_arbiter (
         .clk(clk),
@@ -163,6 +164,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     logic servo_sel;
     logic kitt_sel;
     logic pwm_sel;
+    logic sequencer_sel;
     logic uart_sel;
     logic timer_sel;
     logic flash_sel;
@@ -178,6 +180,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         servo_sel = 0;
         kitt_sel = 0;
 	pwm_sel = 0;
+	sequencer_sel = 0;
         uart_sel = 0;
         timer_sel = 0;
         flash_sel = 0;
@@ -185,20 +188,21 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
 
         /* MEMORY MAP */
         casez (mem_address)
-            32'b00000000_00000000_????????_????????: ram_sel     = 1;
-            32'b00000000_00000001_00000000_000000??: leds_sel    = 1; // LEDS    0x00010000
-            32'b00000000_00000001_00000000_000001??: buttons_sel = 1; // BUTTONS 0x00010004
-            32'b00000000_00000001_00000000_000010??: pmod0_sel   = 1; // PMOD0   0x00010008
-            32'b00000000_00000001_00000000_000011??: pmod1_sel   = 1; // PMOD1   0x0001000c
-            32'b00000000_00000001_00000000_000100??: arduino_sel = 1; // ARDUINO 0x00010010
-            32'b00000000_00000001_00000000_000101??: rtc_sel     = 1; // RTC     0x00010014
-            32'b00000000_00000001_00000000_000110??: servo_sel   = 1; // SERVO   0x00010018
-            32'b00000000_00000001_00000000_000111??: pwm_sel     = 1; // PWM     0x0001001c
-            32'b00000000_00000001_00000000_001000??: kitt_sel    = 1; // KITT    0x00010020
-            32'b00000000_00000010_00000000_0000????: uart_sel    = 1; // UART    0x00020000
-            32'b00000000_00000011_00000000_0000????: timer_sel   = 1; // TIMER   0x00030000
-            32'b00000001_????????_????????_????????: flash_sel   = 1;
-            default:                                 mem_fault   = 1;
+            32'b00000000_00000000_????????_????????: ram_sel       = 1; // RAM        0x00000000
+            32'b00000000_00000001_00000000_000000??: leds_sel      = 1; // LEDS       0x00010000
+            32'b00000000_00000001_00000000_000001??: buttons_sel   = 1; // BUTTONS    0x00010004
+            32'b00000000_00000001_00000000_000010??: pmod0_sel     = 1; // PMOD0      0x00010008
+            32'b00000000_00000001_00000000_000011??: pmod1_sel     = 1; // PMOD1      0x0001000c
+            32'b00000000_00000001_00000000_000100??: arduino_sel   = 1; // ARDUINO    0x00010010
+            32'b00000000_00000001_00000000_000101??: rtc_sel       = 1; // RTC        0x00010014
+            32'b00000000_00000001_00000000_000110??: servo_sel     = 1; // SERVO      0x00010018
+            32'b00000000_00000001_00000000_000111??: pwm_sel       = 1; // PWM        0x0001001c
+            32'b00000000_00000001_00000000_001000??: kitt_sel      = 1; // KITT       0x00010020
+            32'b00000000_00000001_00000001_1???????: sequencer_sel = 1; // SEQUENCER  0x00010180
+            32'b00000000_00000010_00000000_0000????: uart_sel      = 1; // UART       0x00020000
+            32'b00000000_00000011_00000000_0000????: timer_sel     = 1; // TIMER      0x00030000
+            32'b00000001_????????_????????_????????: flash_sel     = 1;
+            default:                                 mem_fault     = 1;
         endcase
     end
 
@@ -310,7 +314,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         /* memory bus */
         .address_in(mem_address),
         .sel_in(rtc_sel),
-//        .read_in(mem_read),
+        //.read_in(mem_read),
         .read_value_out(rtc_read_value),
         .write_mask_in(mem_write_mask),
         .write_value_in(mem_write_value),
@@ -323,7 +327,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
 
     /* SERVO */
 
-//    logic [31:0] servo_read_value;
+    //logic [31:0] servo_read_value;
     logic servo_ready;
 `ifdef SERVO_DEV
     servo #(.BASETIME(`FREQ)) servo (
@@ -335,19 +339,19 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         .address_in(mem_address),
         .sel_in(servo_sel),
         //.read_in(mem_read),
-       // .read_value_out(servo_read_value),
+        //.read_value_out(servo_read_value),
         .write_mask_in(mem_write_mask),
         .write_value_in(mem_write_value),
         .ready_out(servo_ready)
     );
 `else
-//    assign servo_read_value = 0;
+    //assign servo_read_value = 0;
     assign servo_ready = servo_sel;
 `endif
 
     /* PWM */
 
-//    logic [31:0] pwm_read_value;
+    //logic [31:0] pwm_read_value;
     logic pwm_ready;
 `ifdef PWM_DEV
     pwm #(.BASETIME(`FREQ)) pwm (
@@ -359,21 +363,19 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         .address_in(mem_address),
         .sel_in(pwm_sel),
         //.read_in(mem_read),
-       // .read_value_out(pwm_read_value),
+        //.read_value_out(pwm_read_value),
         .write_mask_in(mem_write_mask),
         .write_value_in(mem_write_value),
         .ready_out(pwm_ready)
     );
 `else
-//    assign pwm_read_value = 0;
+    //assign pwm_read_value = 0;
     assign pwm_ready = pwm_sel;
 `endif
 
-
-
     /* KITT */
 
-//    logic [31:0] kitt_read_value;
+    //logic [31:0] kitt_read_value;
     logic kitt_ready;
 `ifdef KITT_DEV
     kitt #(.BASETIME(`FREQ)) kitt (
@@ -384,16 +386,38 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         .address_in(mem_address),
         .sel_in(kitt_sel),
         //.read_in(mem_read),
-       // .read_value_out(kitt_read_value),
+        //.read_value_out(kitt_read_value),
         .write_mask_in(mem_write_mask),
         .write_value_in(mem_write_value),
         .ready_out(kitt_ready)
     );
 `else
-//    assign kitt_read_value = 0;
+    //assign kitt_read_value = 0;
     assign kitt_ready = kitt_sel;
 `endif
 
+    /* SEQUENCER */
+
+    //logic [31:0] sequencer_read_value;
+    logic sequencer_ready;
+`ifdef SEQUENCER_DEV
+    sequencer sequencer (
+        .clk(clk),
+        .reset(reset),
+        .display_out(arduino[7:0]),
+        /* memory bus */
+        .address_in(mem_address),
+        .sel_in(sequencer_sel),
+        //.read_in(mem_read),
+        //.read_value_out(sequencer_read_value),
+        .write_mask_in(mem_write_mask),
+        .write_value_in(mem_write_value),
+        .ready_out(sequencer_ready)
+    );
+`else
+    //assign sequencer_read_value = 0;
+    assign sequencer_ready = sequencer_sel;
+`endif
 
     /* UART */
 
