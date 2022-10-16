@@ -27,7 +27,7 @@ $(ASC_SYN): $(BLIF) $(PCF)
 	arachne-pnr $(QUIET) -d $(DEVICE) -P $(PACKAGE) -o $@ -p $(PCF) $<
 else
 $(ASC_SYN): $(JSON) $(PCF)
-	nextpnr-ice40 $(QUIET) --$(SPEED)$(DEVICE) --package $(PACKAGE) $(SEEDVAL) --json $< --pcf $(PCF) --freq $(FREQ_PLL) --asc $@
+	nextpnr-ice40 --report BUILD/resource_report.txt $(QUIET) --$(SPEED)$(DEVICE) --package $(PACKAGE) $(SEEDVAL) --json $< --pcf $(PCF) --freq $(FREQ_PLL) --asc $@
 endif
 
 $(ASC): $(ASC_SYN) BUILD/progmem_syn.hex BUILD/progmem.hex
