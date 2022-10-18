@@ -187,10 +187,25 @@ void menu_kitt() {
 
 #define SEQUENCER_MAX_SPEED  FREQ/4
 #define SEQUENCER_MIN_SPEED  FREQ
-#define SEQUENCER_MAX_SIZE   32
+#define SEQUENCER_MAX_SIZE   30
 unsigned int sequencer_speed = SEQUENCER_MIN_SPEED;
-unsigned char sequencer_mem[SEQUENCER_MAX_SIZE] = {0x1, 0x3, 0x7, 0xf, 0x1f, 0x3f, 0x7f,0xff,0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
-uint32_t sequencer_size = 0; //SEQUENCER_MAX_SIZE;
+
+unsigned char sequencer_mem[SEQUENCER_MAX_SIZE] = {
+    0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x40, 0x20,
+    0x10, 0x08, 0x04, 0x02, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20,
+    0x40, 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01, 0xff
+};
+
+
+/*
+unsigned char sequencer_mem[SEQUENCER_MAX_SIZE] = {
+    0x18, 0x24, 0x42, 0x81, 0xC3, 0x66, 0x3c, 0xE7, 0xff, 0xf7,
+    0xe7, 0xc7, 0xc3, 0x83, 0x81, 0x01, 0x03, 0x07, 0x0f, 0x1f,
+    0x3f, 0x7f, 0xf3, 0xfc, 0xf8, 0xf0, 0xe0, 0x70, 0x38, 0x1c
+};
+*/
+
+uint32_t sequencer_size = SEQUENCER_MAX_SIZE;
 
 #define SEQUENCER_START_STOP_PORT 31
 #define SEQUENCER_SPEED_PORT      30
@@ -217,29 +232,20 @@ void menu_sequencer() {
         SEQUENCER[SEQUENCER_SPEED_PORT] = SEQUENCER_MIN_SPEED;
       break;
       case '5':
-        uart_puts(">>> SEQUENCER insert incrementing sequence size (unimplemented clear)\r\n");
+        uart_puts(">>> SEQUENCER clear\r\n");
+       	sequencer_size = 0;
+      break;
+      case '6':
+        uart_puts(">>> SEQUENCER read next step\r\n");
         uint32_t pattern = sequencer_size ;
         SEQUENCER[sequencer_size] = pattern;
        	++sequencer_size;
       break;
-      case '6':
-        if (sequencer_size < SEQUENCER_MAX_SIZE) { 
-          uart_puts(">>> SEQUENCER read next step\r\n");
-	  ++sequencer_size;
-//          SEQUENCER[sequencer_size] = 0x3;
-//          SEQUENCER(sequencer_size) = 0x3;
-
-//          *((volatile uint32_t *) SEQUENCER  + sequencer_size * 4  ) = 0x3;
-        }
-      break;
       case '7':
-        for (sequencer_size = 1; sequencer_size <= SEQUENCER_MAX_SIZE; ++sequencer_size) {
-//            SEQUENCER(sequencer_size) = sequencer_mem[sequencer_size - 1];
-//            SEQUENCER[sequencer_size] = sequencer_mem[sequencer_size - 1];
-		
-//          *((volatile uint32_t *) SEQUENCER  + idx * 4  ) = sequencer_mem[idx -1];
+        uart_puts(">>> SEQUENCER load default software\r\n");
+        for (sequencer_size = 0; sequencer_size < SEQUENCER_MAX_SIZE -1 ; ++sequencer_size) {
+          SEQUENCER[sequencer_size] = sequencer_mem[sequencer_size];
         }
-//        *((volatile uint32_t *) SEQUENCER  ) = sequencer_size - 4;
       break;
       case '\n':
       case 0:

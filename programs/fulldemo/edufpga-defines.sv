@@ -10,7 +10,7 @@
 `define KITT_DEV
 `define SEQUENCER_DEV
 
-`define noPMOD0_CONN
+`define PMOD0_CONN
 `define noPMOD1_CONN
 `define ARDUINO_CONN
 

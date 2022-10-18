@@ -404,7 +404,8 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     sequencer sequencer (
         .clk(clk),
         .reset(reset),
-        .display_out(arduino[7:0]),
+//        .display_out(arduino[7:0]),
+        .display_out(pmod0[7:0]),
         /* memory bus */
         .address_in(mem_address),
         .sel_in(sequencer_sel),
