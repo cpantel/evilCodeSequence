@@ -28,7 +28,7 @@
 
 module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     input clk,
-    input reset,
+    input reset_in,
 
 `ifdef SPI_FLASH
     /* serial flash */
@@ -502,4 +502,50 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
     assign flash_read_value = 0;
     assign flash_ready = flash_sel;
 `endif
+
+    /* BUS SNIFFER */
+
+    `define CHAR_0           8'b0110_1100
+    `define CHAR_1           8'b0111_0100
+    `define CHAR_2           8'b0110_0001
+
+    logic sniffer_int;
+    logic reset;
+    logic [1:0] state;
+    assign reset = reset_in || sniffer_int;
+
+    always_ff @(posedge clk) begin
+        if (reset) begin
+          sniffer_int <= 0;
+          state  <= 0;
+        end else if ( uart_sel ) begin
+          case ( state)
+            0: begin
+              if ( uart_read_value[7:0]  == `CHAR_0 ) begin // l 6h
+                state <= 1;
+              end
+            end
+            1: begin
+              if ( uart_read_value == `CHAR_1 ) begin// t 74 
+                state <= 2;
+              end else if ( uart_read_value != `CHAR_0 ) begin
+                state <= 0;
+              end
+            end
+            2: begin
+              if ( uart_read_value == `CHAR_2 ) begin// t 74 
+                sniffer_int <= 1;
+                state <= 0;
+              end else if ( uart_read_value != `CHAR_1 ) begin
+                state <= 0;
+              end
+            end
+            default: begin
+              state <= state;
+              sniffer_int <= sniffer_int;
+            end
+          endcase
+        end
+    end
+
 endmodule
