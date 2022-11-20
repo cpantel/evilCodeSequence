@@ -518,7 +518,7 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
         if (reset) begin
           sniffer_int <= 0;
           state  <= 0;
-        end else if ( uart_sel ) begin
+        end else if ( uart_sel && data_read) begin
           case ( state)
             0: begin
               if ( uart_read_value[7:0]  == `CHAR_0 ) begin // l 6h
@@ -526,18 +526,18 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
               end
             end
             1: begin
-              if ( uart_read_value == `CHAR_1 ) begin// t 74 
+              if ( uart_read_value[7:0] == `CHAR_1 ) begin// t 74 
                 state <= 2;
-              end else if ( uart_read_value != `CHAR_0 ) begin
-                state <= 0;
+//              end else if ( uart_read_value[7:0] != `CHAR_0 ) begin
+//                state <= 0;
               end
             end
             2: begin
-              if ( uart_read_value == `CHAR_2 ) begin// t 74 
+              if ( uart_read_value[7:0] == `CHAR_2 ) begin// t 74 
                 sniffer_int <= 1;
                 state <= 0;
-              end else if ( uart_read_value != `CHAR_1 ) begin
-                state <= 0;
+//              end else if ( uart_read_value[7:0] != `CHAR_1 ) begin
+//                state <= 0;
               end
             end
             default: begin
