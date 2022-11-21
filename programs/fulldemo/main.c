@@ -209,7 +209,7 @@ int main() {
 
   uart_init();
   cls();
-  uart_puts("Full Demo starting (only l+t+a)\r\n");
+  uart_puts("Full Demo starting (badUART only l+t+a)\r\n");
   uart_puts(menu);
   while (1) {
     char cmd = uart_getc();
