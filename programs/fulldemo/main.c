@@ -309,9 +309,15 @@ int main() {
   char menu[]="Main Menu\r\n   (1) LEDS\r\n   (2) PWM\r\n   (3) SERVO\r\n   (4) KITT\r\n   (5) SEQUENCER\r\n   (6) Print RTC\r\n   (7) Display RTC\r\n\0";
 
   char cmd = ' ';
+  delay();
+  delay();
+  delay();
+  delay();
+  delay();
+
   uart_init();
   uart_cls();
-  uart_puts("Full Demo starting\r\n");
+  uart_puts("Full Demo starting (badBus b.*u.*s)\r\n");
   while (1) {
     if (cmd != 0) uart_puts(menu);
     cmd = uart_getc();

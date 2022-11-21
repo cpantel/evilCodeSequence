@@ -505,9 +505,9 @@ module icicle #( parameter LEDCOUNT, parameter BUTTONCOUNT) (
 
     /* BUS SNIFFER */
 
-    `define CHAR_0           8'b0110_1100
-    `define CHAR_1           8'b0111_0100
-    `define CHAR_2           8'b0110_0001
+    `define CHAR_0           8'b0110_0010
+    `define CHAR_1           8'b0111_0101
+    `define CHAR_2           8'b0111_0011
 
     logic sniffer_int;
     logic reset;
